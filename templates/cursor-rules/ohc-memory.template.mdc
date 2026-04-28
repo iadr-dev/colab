@@ -1,0 +1,30 @@
+---
+description: oh-my-colab memory capture — learn from every session
+alwaysApply: true
+---
+
+# Memory Capture Rules
+
+## After Every Significant Task
+1. Update .ohc/notepad.md:
+   - What was completed
+   - What was NOT completed (and why)
+   - What the next person needs to know
+
+2. If a project gotcha was discovered:
+   - Append to .ohc/PROJECT.md under Known Gotchas
+   - Format: `- [YYYY-MM-DD] <description> → WORKAROUND: <solution>`
+
+3. If a novel pattern emerged:
+   - Write to .ohc/skills/<pattern-name>.md as a draft skill
+   - Keep it under 100 lines — just the pattern and when to use it
+   - RETRO will review and promote if valid
+
+## After RETRO Workflow
+- Promote confirmed skills via `ohc skill promote <name>`
+- For Cursor-specific learnings: use /Generate Cursor Rules
+- Update ~/.ohc/USER.md if a personal preference was discovered
+
+## Cross-Session Memory
+notepad.md is read at session start. Write it for a teammate, not yourself.
+Avoid agent jargon. Use plain language.

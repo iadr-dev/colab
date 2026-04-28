@@ -1,0 +1,41 @@
+---
+description: oh-my-colab core workflow rules
+alwaysApply: true
+---
+
+# oh-my-colab Core Rules
+
+## Session Start
+Read .ohc/notepad.md for current working state.
+Read .ohc/PROJECT.md for project context.
+Greet user: current task + git branch + plan progress.
+
+## Workflow Routing
+- "explore"   → EXPLORE: read codebase, populate .ohc/PROJECT.md
+- "plan"      → PLAN: interview → design → .ohc/plans/ → confirm before build
+- "build"     → BUILD: load plan → subagents → TDD → verify
+- "review"    → REVIEW: spec compliance first, code quality second
+- "ship"      → SHIP: pre-merge check → changelog → PR → clean
+- "retro"     → RETRO: session diff → learnings → update memory files
+- "autopilot" → PLAN + BUILD + REVIEW chained, pause at plan for human OK
+
+## Discipline Rules
+- No code for tasks >30min without a plan in .ohc/plans/
+- Always run tests before claiming done — read the actual output
+- Stay within agreed scope. Spotted issues → .ohc/notepad.md, not fixes.
+- Use Context7 for any external library docs before writing API calls
+
+## Memory Protocol
+- After significant work: update .ohc/notepad.md (what done, what next, blockers)
+- New project gotcha: append to .ohc/PROJECT.md Known Gotchas
+- Novel pattern: write draft to .ohc/skills/ for RETRO to review
+
+## Agent Routing
+- planner (opus): design, requirements, decomposition
+- executor (sonnet): code writing
+- reviewer (opus): code review, security
+- verifier (sonnet): test execution
+- debugger (sonnet): root cause analysis
+- researcher (haiku): Context7, Brave Search
+- writer (haiku): changelogs, PR descriptions
+- collaborator (sonnet): team handoffs
