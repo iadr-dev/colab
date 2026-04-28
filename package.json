@@ -5,7 +5,6 @@
   "keywords": ["claude-code", "cursor", "codex", "gemini", "antigravity", "ai-coding", "workflows", "tdd", "agents", "mcp"],
   "license": "MIT",
   "bin": { "ohc": "scripts/ohc" },
-  "main": ".opencode/plugins/colab.js",
   "scripts": {
     "test": "bash tests/smoke/test-all.sh",
     "lint:skills": "node tests/smoke/check-skill-lines.js"
