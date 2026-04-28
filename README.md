@@ -59,8 +59,9 @@ ohc setup
 
 ### Codex CLI
 
-```
-Fetch and follow https://raw.githubusercontent.com/iadr-dev/colab/main/.codex-bootstrap/INSTALL.md
+```bash
+npm install -g @iadr-dev/colab
+ohc setup
 ```
 
 ### Gemini CLI
@@ -204,16 +205,16 @@ Configured automatically during `ohc setup` via `claude mcp add`.
 
 ## Platform support matrix
 
-| Feature         |    Claude Code    |      Cursor       |    Antigravity    |   Codex   |  Gemini   |
-| --------------- | :---------------: | :---------------: | :---------------: | :-------: | :-------: |
-| System context  |     CLAUDE.md     |     AGENTS.md     |     AGENTS.md     | AGENTS.md | GEMINI.md |
-| Rules / skills  |      skills/      |  .cursor/rules/   |   .agent/rules/   |     —     |     —     |
-| Commands        | .claude/commands/ | .cursor/commands/ | .agent/workflows/ |     —     |     —     |
-| Hooks           |  .claude/hooks/   |         —         |         —         |     —     |     —     |
-| HUD             |         ✓         |         —         |         —         |     —     |     —     |
-| Parallel agents |     ✓ native      |     ✓ native      |     ✓ native      |   tmux    |   tmux    |
-| MCP install     |  claude mcp add   |         —         |         —         |     —     |     —     |
-| Context7        |         ✓         |         ✓         |         ✓         |     ✓     |     ✓     |
+| Feature         |    Claude Code    |      Cursor       |    Antigravity    |   Codex   |  Gemini   | OpenCode  |
+| --------------- | :---------------: | :---------------: | :---------------: | :-------: | :-------: | :-------: |
+| System context  |     CLAUDE.md     |     AGENTS.md     |     AGENTS.md     | AGENTS.md | GEMINI.md | AGENTS.md |
+| Rules / skills  |      skills/      |  .cursor/rules/   |   .agent/rules/   |     —     |     —     |  skills/  |
+| Commands        | .claude/commands/ | .cursor/commands/ | .agent/workflows/ |     —     |     —     | commands/ |
+| Hooks           |  .claude/hooks/   |         —         |         —         |     —     |     —     |     —     |
+| HUD             |         ✓         |         —         |         —         |     —     |     —     |     —     |
+| Parallel agents |     ✓ native      |     ✓ native      |     ✓ native      |   tmux    |   tmux    |   tmux    |
+| MCP install     |  claude mcp add   |         —         |         —         |     —     |     —     |     —     |
+| Context7        |         ✓         |         ✓         |         ✓         |     ✓     |     ✓     |     ✓     |
 
 ---
 
