@@ -1,0 +1,20 @@
+{
+  "name": "@iadr/colab",
+  "version": "0.1.0",
+  "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory across Claude Code, Cursor, Codex, Gemini, and Antigravity.",
+  "keywords": ["claude-code", "cursor", "codex", "gemini", "antigravity", "ai-coding", "workflows", "tdd", "agents", "mcp"],
+  "license": "MIT",
+  "bin": { "ohc": "scripts/ohc" },
+  "main": ".opencode/plugins/colab.js",
+  "scripts": {
+    "test": "bash tests/smoke/test-all.sh",
+    "lint:skills": "node tests/smoke/check-skill-lines.js"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iadr-dev/colab"
+  },
+  "homepage": "https://github.com/iadr-dev/colab#readme",
+  "bugs": { "url": "https://github.com/iadr-dev/colab/issues" }
+}
