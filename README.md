@@ -32,14 +32,14 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 
 ```
 /plugin marketplace add iadr-dev/colab
-/plugin install @iadr/colab
+/plugin install @iadr-dev/colab
 /setup
 ```
 
 ### npm CLI
 
 ```bash
-npm install -g @iadr/colab
+npm install -g @iadr-dev/colab
 ohc setup
 ```
 

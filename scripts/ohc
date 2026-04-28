@@ -19,7 +19,7 @@ const COMMANDS = {
 };
 
 if (!cmd || cmd === 'help' || cmd === '--help') {
-  console.log('\n  🧠 oh-my-colab CLI (@iadr/colab)\n');
+  console.log('\n  🧠 oh-my-colab CLI (@iadr-dev/colab)\n');
   for (const [c, d] of Object.entries(COMMANDS))
     console.log(`  ohc ${c.padEnd(14)} ${d}`);
   console.log('\n  GitHub: https://github.com/iadr-dev/colab\n');

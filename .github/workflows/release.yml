@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   release:
@@ -15,8 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
       - run: npm install
       - name: Run all CI checks
         run: |
@@ -35,14 +35,14 @@ jobs:
             ## Install
 
             ```bash
-            npm install -g @iadr/colab
+            npm install -g @iadr-dev/colab
             ohc setup
             ```
 
             Or in Claude Code:
             ```
             /plugin marketplace add iadr-dev/colab
-            /plugin install @iadr/colab
+            /plugin install @iadr-dev/colab
             ```
 
             GitHub: https://github.com/iadr-dev/colab
