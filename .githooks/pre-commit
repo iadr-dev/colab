@@ -1,0 +1,13 @@
+#!/bin/bash
+# Pre-commit hook to check version consistency
+
+echo "Checking version consistency..."
+
+if ! npm run version:check --silent; then
+    echo "❌ Version inconsistency detected!"
+    echo "Run 'npm run version:fix' to synchronize all version files."
+    echo "Then stage and commit the changes."
+    exit 1
+fi
+
+echo "✅ All versions are consistent"
