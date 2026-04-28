@@ -34,6 +34,22 @@
 | Pydantic | /pydantic/pydantic |
 | Django | /django/django |
 
+## Mobile
+| Library | Context7 ID |
+|---------|------------|
+| React Native | /facebook/react-native |
+| Expo | /expo/expo |
+| React Navigation | /react-navigation/react-navigation |
+| NativeWind | /marklawlor/nativewind |
+| Zustand (shared) | /pmndrs/zustand |
+| React Native MMKV | /mrousavy/react-native-mmkv |
+| React Native Reanimated | /software-mansion/react-native-reanimated |
+| Flutter | /flutter/flutter |
+| Kotlin Coroutines | /kotlin/kotlinx.coroutines |
+| Jetpack Compose | /JetBrains/compose-multiplatform |
+| Ktor | /ktorio/ktor |
+| SwiftUI (Swift) | /nicklockwood/SwiftFormat |
+
 ## Tools
 | Library | Context7 ID |
 |---------|------------|
