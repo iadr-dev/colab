@@ -1,6 +1,6 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory across Claude Code, Cursor, Codex, Gemini, and Antigravity.",
   "keywords": [
     "claude-code",
@@ -23,7 +23,15 @@
   },
   "scripts": {
     "test": "bash tests/smoke/test-all.sh",
-    "lint:skills": "node tests/smoke/check-skill-lines.js"
+    "lint:skills": "node tests/smoke/check-skill-lines.js",
+    "version:check": "node scripts/version.js check",
+    "version:fix": "node scripts/version.js fix",
+    "version:set": "node scripts/version.js set",
+    "version:bump": "node scripts/version.js bump",
+    "version:bump:minor": "node scripts/version.js bump minor",
+    "version:bump:major": "node scripts/version.js bump major",
+    "version:tag": "node scripts/version.js tag",
+    "version:current": "node scripts/version.js current"
   },
   "engines": {
     "node": ">=18.0.0"

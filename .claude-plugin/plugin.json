@@ -1,13 +1,25 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
   "entrypoint": "CLAUDE.md",
-  "commands": ["setup","explore","plan","build","review","ship","retro","autopilot","team","ask","skill"],
+  "commands": [
+    "setup",
+    "explore",
+    "plan",
+    "build",
+    "review",
+    "ship",
+    "retro",
+    "autopilot",
+    "team",
+    "ask",
+    "skill"
+  ],
   "hooks": {
-    "preToolUse":    ".claude/hooks/on-pre-tool.js",
-    "postToolUse":   ".claude/hooks/on-post-tool.js",
-    "stop":          ".claude/hooks/on-stop.js",
-    "sessionStart":  ".claude/hooks/on-session-start.js"
+    "preToolUse": ".claude/hooks/on-pre-tool.js",
+    "postToolUse": ".claude/hooks/on-post-tool.js",
+    "stop": ".claude/hooks/on-stop.js",
+    "sessionStart": ".claude/hooks/on-session-start.js"
   }
 }

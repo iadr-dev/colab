@@ -9,7 +9,7 @@ Run the interactive setup wizard. Installs oh-my-colab for detected platforms.
 If `ohc` CLI available: run `ohc setup` in terminal for the full interactive experience.
 
 Steps:
-1. Select platforms (Claude Code, Cursor, Antigravity, Codex, Gemini)
+1. Select platforms (Claude Code, Cursor, Antigravity, Codex, Gemini and Opencode)
 2. Select team size (solo / small team / org)
 3. Select default workflow
 4. Select MCP servers — collect API keys inline for those that need them

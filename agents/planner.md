@@ -1,5 +1,5 @@
 # Agent: Planner
-model: claude-opus-4-6
+model: claude-opus-4-7
 triggers: [design, architecture, requirements, "plan this", "how should we", "what's the best way"]
 handoff_to: [executor]
 
