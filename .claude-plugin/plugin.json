@@ -1,5 +1,5 @@
 {
-  "name": "@iadr/colab",
+  "name": "@iadr-dev/colab",
   "version": "0.1.0",
   "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
   "entrypoint": "CLAUDE.md",

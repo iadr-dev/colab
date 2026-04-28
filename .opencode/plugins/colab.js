@@ -2,7 +2,7 @@
  * oh-my-colab — OpenCode plugin entry
  */
 module.exports = {
-  name: '@iadr/colab',
+  name: '@iadr-dev/colab',
   version: '0.1.0',
   contextFile: 'CLAUDE.md',
   onInstall: async () => {
