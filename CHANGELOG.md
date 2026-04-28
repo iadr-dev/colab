@@ -10,6 +10,40 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.3.1] — 2026-04-28
+
+### Fixed
+
+- **Version check exit code** — `scripts/version.js` now properly exits with code 1 when version inconsistencies are detected, allowing pre-commit hooks to correctly block inconsistent commits
+- **Gradle package manager detection** — `project-scanner.js` now correctly identifies Gradle projects using Groovy DSL (`build.gradle`) in addition to Kotlin DSL (`build.gradle.kts`)
+
+---
+
+## [0.3.0] — 2026-04-28
+
+### Added
+
+- **Centralized version management system** — new `scripts/version.js` with npm scripts for consistent version control across package.json, plugin configs, and setup scripts
+- **Pre-commit hooks** — automated version consistency checks to prevent inconsistent commits
+- **Automated git tagging** — `npm run version:tag` creates and pushes release tags
+- **Context7 library coverage expansion** — mobile ecosystem (Android/Kotlin with Hilt, Room, Retrofit; iOS/Swift with Core Data, Alamofire), AI/LLM SDKs, infrastructure tools
+- **Organized library reference** — split large library-ids.md into focused category files for better navigation
+- **Research mode documentation** — enhanced Context7 usage with fallback strategies
+
+### Changed
+
+- **Library ID organization** — reorganized into frontend, backend, mobile, AI/LLM, infrastructure, and testing categories
+- **Context7 skill structure** — updated to reference category-specific library ID files
+- **Version management workflow** — VERSION.md documentation with commands and examples
+
+### Technical
+
+- **NPM scripts** — version:check, version:fix, version:set, version:bump (patch/minor/major), version:tag, version:current
+- **Template file handling** — supports multiple regex patterns for version references in JavaScript templates
+- **Mobile development coverage** — Android (Kotlin, Jetpack Compose, Hilt, Navigation, Material Design), iOS (Swift, SwiftUI, Core Data, Alamofire)
+
+---
+
 ## [0.2.1] — 2026-04-28
 
 ### Fixed
@@ -114,7 +148,9 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/iadr-dev/colab/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/iadr-dev/colab/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/iadr-dev/colab/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/iadr-dev/colab/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/iadr-dev/colab/releases/tag/v0.1.0

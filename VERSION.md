@@ -55,15 +55,21 @@ npm run version:current
 ```
 Displays the current version number.
 
+### Update Changelog
+```bash
+npm run version:changelog
+```
+Updates CHANGELOG.md with an entry for the current version.
+
 ## Workflow Examples
 
 ### Releasing a New Version
 ```bash
-# 1. Bump version
+# 1. Bump version (automatically updates changelog)
 npm run version:bump:minor
 
 # 2. Commit changes
-git commit -am "Bump version to 0.3.0"
+git commit -am "Release version 0.3.0"
 
 # 3. Create git tag
 npm run version:tag
@@ -71,6 +77,8 @@ npm run version:tag
 # 4. Push to repository
 git push && git push --tags
 ```
+
+**Note**: Version bumping automatically updates the changelog with a new entry. The changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
 ### Fixing Version Drift
 If versions get out of sync during development:
