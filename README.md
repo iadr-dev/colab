@@ -183,41 +183,6 @@ Configured automatically during `ohc setup` via `claude mcp add`.
 
 ---
 
-## Interactive setup
-
-```
-╔══════════════════════════════════════════╗
-║  oh-my-colab setup (4/6)                ║
-║  MCP servers (Space to toggle)          ║
-╠══════════════════════════════════════════╣
-║  ▶ [✓] Context7  — live docs (optional key) ║
-║    [✓] GitHub MCP — repos/PRs/CI       ║
-║    [✓] Brave Search — web search       ║
-║    [ ] Playwright — browser/e2e        ║
-╚══════════════════════════════════════════╝
-  GitHub MCP selected. Enter your token:
-  > ghp_*********************
-```
-
-6 screens. Arrow keys + Space + Enter. API keys collected inline, installed via `claude mcp add`.
-
----
-
-## Platform support matrix
-
-| Feature         |    Claude Code    |      Cursor       |    Antigravity    |   Codex   |  Gemini   | OpenCode  |
-| --------------- | :---------------: | :---------------: | :---------------: | :-------: | :-------: | :-------: |
-| System context  |     CLAUDE.md     |     AGENTS.md     |     AGENTS.md     | AGENTS.md | GEMINI.md | AGENTS.md |
-| Rules / skills  |      skills/      |  .cursor/rules/   |   .agent/rules/   |     —     |     —     |  skills/  |
-| Commands        | .claude/commands/ | .cursor/commands/ | .agent/workflows/ |     —     |     —     | commands/ |
-| Hooks           |  .claude/hooks/   |         —         |         —         |     —     |     —     |     —     |
-| HUD             |         ✓         |         —         |         —         |     —     |     —     |     —     |
-| Parallel agents |     ✓ native      |     ✓ native      |     ✓ native      |   tmux    |   tmux    |   tmux    |
-| MCP install     |  claude mcp add   |         —         |         —         |     —     |     —     |     —     |
-| Context7        |         ✓         |         ✓         |         ✓         |     ✓     |     ✓     |     ✓     |
-
----
-
 ## ohc CLI
 
 ```bash
