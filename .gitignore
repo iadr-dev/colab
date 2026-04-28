@@ -1,0 +1,18 @@
+# Runtime state — never commit
+.ohc/
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+*.env
+.env.*
+!.env.example
+
+# MCP config is written by `claude mcp add` to ~/.claude.json — not a repo file
+# Do NOT add .mcp.json here — we don't create it anymore

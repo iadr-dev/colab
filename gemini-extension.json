@@ -1,0 +1,6 @@
+{
+  "name": "@iadr/colab",
+  "version": "0.1.0",
+  "contextFileName": "GEMINI.md",
+  "description": "Team-first AI coding workflows for Gemini CLI"
+}
