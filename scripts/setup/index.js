@@ -117,14 +117,16 @@ async function run() {
     ['SOUL.md',                        () => genSoul()],
     ['USER.md',                        () => genUser(config)],
     ['PROJECT.md',                     () => genProject(config)],
-    ['CLAUDE.md + AGENTS.md',          () => genClaude(config)],
-    ['~/.claude/settings.json',        () => genSettings(config)],
-    ['.claude/hooks/ + commands/',     () => writeClaudeFiles()],
+    (platforms.includes('Claude Code') || platforms.includes('Codex CLI') || platforms.includes('OpenCode'))
+                                       ? ['AGENTS.md / CLAUDE.md',          () => genAgents(config)] : null,
+    platforms.includes('Claude Code')  ? ['~/.claude/settings.json',        () => genSettings(config)] : null,
+    platforms.includes('Claude Code')  ? ['.claude/hooks/ + commands/',     () => writeClaudeFiles()] : null,
     platforms.includes('Cursor')       ? ['.cursor/rules/ + commands/', () => writeCursor(config)] : null,
     platforms.includes('Antigravity')  ? ['.agent/ rules/skills/workflows', () => writeAntigravity()] : null,
     platforms.includes('Gemini CLI')   ? ['GEMINI.md + gemini-extension.json', () => writeGemini(config)] : null,
     platforms.includes('Codex CLI')    ? ['.codex context file', () => writeCodex()] : null,
-    ['MCP servers via claude mcp add', () => installMcp(config)],
+    platforms.includes('OpenCode')     ? ['.opencode/ dirs + config', () => writeOpenCode(config)] : null,
+    platforms.includes('Claude Code')  ? ['MCP servers via claude mcp add', () => installMcp(config)] : null,
     hudStyle !== 'None'                ? ['HUD status bar',            () => writeHud(config)] : null,
     ['~/.ohc/config.json',             () => writeConfig(config)],
   ].filter(Boolean);
@@ -198,7 +200,7 @@ function genProject({ project }) {
   }));
 }
 
-function genClaude({ project, selectedMcp, teamMode }) {
+function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
     version: '0.1.0', project_name: project.projectName,
@@ -207,11 +209,18 @@ function genClaude({ project, selectedMcp, teamMode }) {
     max_parallel: teamMode.includes('Large') ? '8' : '4',
     mcp_servers_list: mcp
   });
-  write(path.join(CWD, 'CLAUDE.md'), content);
+  const needsClaude = platforms.includes('Claude Code');
+  if (needsClaude) {
+    write(path.join(CWD, 'CLAUDE.md'), content);
+  }
   const agents = path.join(CWD, 'AGENTS.md');
   if (!fs.existsSync(agents)) {
-    try { fs.symlinkSync('CLAUDE.md', agents); }
-    catch { fs.copyFileSync(path.join(CWD, 'CLAUDE.md'), agents); }
+    if (needsClaude) {
+      try { fs.symlinkSync('CLAUDE.md', agents); }
+      catch { write(agents, content); }
+    } else {
+      write(agents, content);
+    }
   }
 }
 
@@ -284,15 +293,85 @@ function writeAntigravity() {
   mkdir(path.join(global, 'global_workflows'));
 }
 
-function writeGemini({ project }) {
+function writeGemini({ project, selectedMcp, mcpKeys }) {
   write(path.join(CWD, 'GEMINI.md'), fill(tmpl('GEMINI.template.md'), { project_name: project.projectName }));
+  
+  const mcpServers = {};
+  for (const srv of selectedMcp) {
+    let env = {};
+    const keys = mcpKeys[srv.name];
+    if (keys) {
+      for (const [k, v] of Object.entries(keys)) env[k] = v;
+    }
+    const args = [...srv.args];
+    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
+      args.push('--api-key', keys.CONTEXT7_API_KEY);
+    }
+    mcpServers[srv.name] = { command: srv.command, args, env };
+  }
+  
+  write(path.join(CWD, 'gemini-extension.json'), JSON.stringify({
+    name: project.projectName,
+    version: "1.0.0",
+    description: `Gemini Code Assist extension for ${project.projectName}`,
+    mcpServers
+  }, null, 2));
+}
+
+function writeOpenCode({ selectedMcp, mcpKeys }) {
+  ['agents', 'commands', 'skills', 'tools'].forEach(d => 
+    mkdir(path.join(CWD, '.opencode', d))
+  );
+  
+  const mcpServers = {};
+  for (const srv of selectedMcp) {
+    let env = {};
+    const keys = mcpKeys[srv.name];
+    if (keys) {
+      for (const [k, v] of Object.entries(keys)) env[k] = v;
+    }
+    const args = [...srv.args];
+    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
+      args.push('--api-key', keys.CONTEXT7_API_KEY);
+    }
+    mcpServers[srv.name] = { command: srv.command, args, env };
+  }
+
+  write(path.join(CWD, 'opencode.json'), JSON.stringify({
+    telemetry: false,
+    theme: 'default',
+    mcpServers
+  }, null, 2));
 }
 
 function writeCodex() {
-  // .codex already in repo root — just confirm it exists
-  const src = path.join(PKG_ROOT, '.codex');
-  const dst = path.join(CWD, '.codex');
-  if (!fs.existsSync(dst) && fs.existsSync(src)) fs.copyFileSync(src, dst);
+  const content = `# oh-my-colab context for Codex CLI
+
+You are operating with the oh-my-colab framework — a team-first AI coding workflow system.
+
+## Identity
+Read AGENTS.md for your full system context, agent catalog, and workflow definitions.
+Read .ohc/notepad.md at the start of every session to restore working state.
+
+## Core Rules
+1. Never write code for tasks >30 minutes without a plan in .ohc/plans/
+2. Always run tests before claiming a task complete
+3. Update .ohc/notepad.md when finishing work (for team handoff)
+4. Follow ohc-coding-discipline: minimal scope, surgical changes, explicit assumptions
+5. Use Context7 for any external library documentation before writing API calls
+
+## Workflows
+- "explore" → explore codebase, populate .ohc/PROJECT.md
+- "plan"    → write plan to .ohc/plans/, confirm before building
+- "build"   → load plan, dispatch subagents, enforce TDD
+- "review"  → two-pass: spec compliance then code quality
+- "ship"    → verify tests, write changelog, clean branch
+- "retro"   → session retrospective, extract learnings
+
+## Bootstrap
+If fresh install: fetch and follow .codex-bootstrap/INSTALL.md
+`;
+  write(path.join(CWD, '.codex'), content);
 }
 
 function installMcp({ selectedMcp, mcpKeys }) {
