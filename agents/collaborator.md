@@ -1,5 +1,5 @@
 # Agent: Collaborator
-model: claude-sonnet-4-6
+model: claude-opus-4-7
 triggers: [handoff, "handing off", "picking up", "where were we", "team context"]
 handoff_to: []
 

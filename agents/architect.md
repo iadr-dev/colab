@@ -1,5 +1,5 @@
 # Agent: Architect
-model: claude-opus-4-6
+model: claude-opus-4-7
 triggers: [architecture, "system design", ADR, "how should we structure", "design the"]
 handoff_to: [planner]
 
