@@ -1,63 +1,32 @@
-# Context7 Library IDs — Quick Reference
+# Context7 Library IDs - Index
 
-## Frontend
-| Library | Context7 ID |
-|---------|------------|
-| Next.js | /vercel/next.js |
-| React | /facebook/react |
-| Vue | /vuejs/core |
-| Svelte | /sveltejs/svelte |
-| Tailwind CSS | /tailwindlabs/tailwindcss |
-| shadcn/ui | /shadcn-ui/ui |
-| Radix UI | /radix-ui/primitives |
-| Framer Motion | /framer/motion |
-| Zustand | /pmndrs/zustand |
-| TanStack Query | /tanstack/query |
-| TanStack Router | /tanstack/router |
+This directory contains Context7-compatible library IDs organized by category:
 
-## Backend / Full-stack
-| Library | Context7 ID |
-|---------|------------|
-| Prisma | /prisma/prisma |
-| Drizzle ORM | /drizzle-team/drizzle-orm |
-| tRPC | /trpc/trpc |
-| Express | /expressjs/express |
-| Fastify | /fastify/fastify |
-| NestJS | /nestjs/nest |
-| Hono | /honojs/hono |
+## Reference Files
 
-## Python
-| Library | Context7 ID |
-|---------|------------|
-| FastAPI | /tiangolo/fastapi |
-| SQLAlchemy | /sqlalchemy/sqlalchemy |
-| Pydantic | /pydantic/pydantic |
-| Django | /django/django |
+- **[frontend-library-ids.md](frontend-library-ids.md)** - React, Vue, Svelte, Next.js, Tailwind CSS, state management, forms, charts, build tools
+- **[backend-fullstack-library-ids.md](backend-fullstack-library-ids.md)** - Express, Fastify, NestJS, tRPC, databases, ORMs, auth, payments
+- **[python-library-ids.md](python-library-ids.md)** - FastAPI, Flask, Django, data science, ML, Jupyter, testing
+- **[mobile-library-ids.md](mobile-library-ids.md)** - React Native, Flutter, Android/Kotlin, iOS/Swift, Jetpack, SwiftUI
+- **[testing-validation-library-ids.md](testing-validation-library-ids.md)** - Vitest, Jest, Playwright, Cypress, Testing Library, MSW, Storybook
+- **[ai-llm-library-ids.md](ai-llm-library-ids.md)** - Vercel AI SDK, LangChain, LlamaIndex, OpenAI, Anthropic, vector databases
+- **[infrastructure-devops-library-ids.md](infrastructure-devops-library-ids.md)** - Cloud platforms, Docker, Kubernetes, Terraform, observability
+- **[utilities-library-ids.md](utilities-library-ids.md)** - General utilities, validation, date handling
 
-## Mobile
-| Library | Context7 ID |
-|---------|------------|
-| React Native | /facebook/react-native |
-| Expo | /expo/expo |
-| React Navigation | /react-navigation/react-navigation |
-| NativeWind | /marklawlor/nativewind |
-| Zustand (shared) | /pmndrs/zustand |
-| React Native MMKV | /mrousavy/react-native-mmkv |
-| React Native Reanimated | /software-mansion/react-native-reanimated |
-| Flutter | /flutter/flutter |
-| Kotlin Coroutines | /kotlin/kotlinx.coroutines |
-| Jetpack Compose | /JetBrains/compose-multiplatform |
-| Ktor | /ktorio/ktor |
-| SwiftUI (Swift) | /nicklockwood/SwiftFormat |
+## Usage
 
-## Tools
-| Library | Context7 ID |
-|---------|------------|
-| Vitest | /vitest-dev/vitest |
-| Playwright | /microsoft/playwright |
-| Zod | /colinhacks/zod |
-| date-fns | /date-fns/date-fns |
+Each file contains Context7 IDs for related libraries. Use these IDs with the Context7 tools:
 
-## Adding New Libraries
-Try: `/org/repo-name` (GitHub format).
-Context7 indexes most public GitHub repos automatically.
+```bash
+context7 /vercel/next.js — server components
+```
+
+## Quick Search
+
+Common patterns:
+- **Frontend**: Next.js (`/vercel/next.js`), React (`/facebook/react`), Tailwind (`/tailwindlabs/tailwindcss.com`)
+- **Backend**: Prisma (`/prisma/prisma`), tRPC (`/trpc/trpc`), Express (`/expressjs/express`)
+- **Mobile**: React Native (`/facebook/react-native`), Flutter (`/flutter/flutter`)
+- **AI/LLM**: Vercel AI SDK (`/websites/ai-sdk_dev`), LangChain (`/websites/langchain`)
+
+See individual files for complete listings and specialized frameworks.

@@ -33,17 +33,30 @@ use context7 nextjs — what is the correct way to use server actions in Next.js
 ```
 context7 /vercel/next.js — app router metadata API
 context7 /prisma/prisma — transaction API
-context7 /tailwindlabs/tailwindcss — responsive variants
+context7 /tailwindlabs/tailwindcss.com — responsive variants
 ```
 
-See references/library-ids.md for common IDs.
+See references/ folder for library IDs organized by category:
+- **references/frontend-library-ids.md** - React, Vue, Next.js, Tailwind CSS
+- **references/backend-fullstack-library-ids.md** - Express, Prisma, tRPC, auth
+- **references/mobile-library-ids.md** - React Native, Flutter, Android, iOS
+- **references/python-library-ids.md** - FastAPI, Flask, Django, data science
+- **references/ai-llm-library-ids.md** - Vercel AI SDK, LangChain, OpenAI
+
+### Research mode
+Use normal Context7 queries first. If the answer is shallow, outdated, or missing the
+exact API surface needed, retry the same query with research mode enabled.
+
+Research mode requires a Context7 API key. If unavailable, say so explicitly and use
+the normal docs response plus official docs/source as the fallback.
 
 ## When Context7 Returns Nothing
 
 1. Try broader query (less specific version requirement)
-2. Fall back to researcher agent with Brave Search
-3. Check library's official GitHub — read source if docs missing
-4. Flag explicitly: "Could not find current docs for X. Based on v{N} docs: ..."
+2. Retry with research mode if a Context7 API key is configured
+3. Fall back to researcher agent with Brave Search
+4. Check library's official GitHub — read source if docs missing
+5. Flag explicitly: "Could not find current docs for X. Based on v{N} docs: ..."
 
 Never silently guess. Always flag when docs were unavailable.
 
