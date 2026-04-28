@@ -203,7 +203,7 @@ function genProject({ project }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.2.1', project_name: project.projectName,
+    version: '0.3.0', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -312,7 +312,7 @@ function writeGemini({ project, selectedMcp, mcpKeys }) {
   
   write(path.join(CWD, 'gemini-extension.json'), JSON.stringify({
     name: project.projectName,
-    version: "0.2.1",
+    version: "0.3.0",
     description: `Gemini Code Assist extension for ${project.projectName}`,
     mcpServers
   }, null, 2));
@@ -411,7 +411,7 @@ function writeHud({ hudStyle }) {
 
 function writeConfig({ platforms, teamMode, workflow, notifications, hudStyle }) {
   write(path.join(os.homedir(), '.ohc', 'config.json'), JSON.stringify({
-    version: '0.2.1', platforms, teamMode,
+    version: '0.3.0', platforms, teamMode,
     defaultWorkflow: workflow, notifications, hudStyle,
     installedAt: new Date().toISOString()
   }, null, 2));
