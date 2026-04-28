@@ -82,7 +82,7 @@ function scan(cwd = process.cwd()) {
   else if (exists(path.join(cwd, 'poetry.lock'))) packageManager = 'poetry';
   else if (exists(path.join(cwd, 'pubspec.yaml'))) packageManager = 'pub';
   else if (exists(path.join(cwd, 'Package.swift'))) packageManager = 'spm';
-  else if (exists(path.join(cwd, 'build.gradle.kts')) || exists(path.join(cwd, 'gradlew'))) packageManager = 'gradle';
+  else if (exists(path.join(cwd, 'build.gradle')) || exists(path.join(cwd, 'build.gradle.kts')) || exists(path.join(cwd, 'gradlew'))) packageManager = 'gradle';
   else if (exists(path.join(cwd, 'pom.xml'))) packageManager = 'maven';
   else if (exists(path.join(cwd, 'Gemfile.lock'))) packageManager = 'bundler';
 

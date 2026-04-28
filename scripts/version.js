@@ -306,6 +306,68 @@ class VersionManager {
       console.log(`⚠ Could not create git tag: ${error.message}`);
     }
   }
+
+  updateChangelog(version, releaseDate = null, changes = null) {
+    const changelogPath = path.join(ROOT, 'CHANGELOG.md');
+    
+    if (!fs.existsSync(changelogPath)) {
+      console.log('⚠ CHANGELOG.md not found, skipping changelog update');
+      return;
+    }
+
+    try {
+      let content = fs.readFileSync(changelogPath, 'utf8');
+      const date = releaseDate || new Date().toISOString().split('T')[0];
+      
+      // Detect line ending style
+      const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
+      
+      // Prepare new version entry
+      const newVersionEntry = changes ? 
+        `## [${version}] — ${date}${lineEnding}${lineEnding}${changes}${lineEnding}${lineEnding}---${lineEnding}${lineEnding}` :
+        `## [${version}] — ${date}${lineEnding}${lineEnding}### Changed${lineEnding}${lineEnding}- Version bump to ${version}${lineEnding}${lineEnding}---${lineEnding}${lineEnding}`;
+
+      // Replace [Unreleased] section with new version (handle both LF and CRLF)
+      const unreleasedPattern = /## \[Unreleased\]\r?\n\r?\n---\r?\n\r?\n/;
+      
+      if (unreleasedPattern.test(content)) {
+        content = content.replace(
+          unreleasedPattern,
+          `## [Unreleased]${lineEnding}${lineEnding}---${lineEnding}${lineEnding}${newVersionEntry}`
+        );
+      } else {
+        // If no Unreleased section, add after first heading
+        const firstVersionPattern = /(---\s*\n\n)(## \[)/;
+        if (firstVersionPattern.test(content)) {
+          content = content.replace(firstVersionPattern, `$1${newVersionEntry}$2`);
+        }
+      }
+
+      // Update the links section at the bottom
+      const linksPattern = /(\[Unreleased\]: https:\/\/github\.com\/[^\/]+\/[^\/]+\/compare\/v[^.]+\.[^.]+\.[^.]+\.\.\.HEAD\n)/;
+      const repoMatch = content.match(/\[Unreleased\]: https:\/\/github\.com\/([^\/]+\/[^\/]+)/);
+      
+      if (repoMatch && linksPattern.test(content)) {
+        const repoPath = repoMatch[1];
+        const newUnreleasedLink = `[Unreleased]: https://github.com/${repoPath}/compare/v${version}...HEAD\n`;
+        const newVersionLink = `[${version}]: https://github.com/${repoPath}/compare/v${this.getPreviousVersion(content)}...v${version}\n`;
+        
+        content = content.replace(linksPattern, `${newUnreleasedLink}${newVersionLink}`);
+      }
+
+      fs.writeFileSync(changelogPath, content, 'utf8');
+      console.log(`✅ Updated CHANGELOG.md for version ${version}`);
+      
+    } catch (error) {
+      console.log(`⚠ Could not update CHANGELOG.md: ${error.message}`);
+    }
+  }
+
+  getPreviousVersion(changelogContent) {
+    // Extract the most recent version from changelog links
+    const versionMatch = changelogContent.match(/\[([0-9]+\.[0-9]+\.[0-9]+)\]:/);
+    return versionMatch ? versionMatch[1] : '0.0.0';
+  }
 }
 
 // CLI Interface
@@ -317,7 +379,10 @@ function main() {
   try {
     switch (command) {
       case 'check':
-        versionManager.check();
+        const isConsistent = versionManager.check();
+        if (!isConsistent) {
+          process.exit(1);
+        }
         break;
         
       case 'fix':
@@ -335,8 +400,12 @@ function main() {
       case 'bump':
         const bumpType = args[1] || 'patch';
         const newVersion = versionManager.bump(bumpType);
+        
+        // Automatically update changelog
+        versionManager.updateChangelog(newVersion);
+        
         console.log(`\nNext steps:`);
-        console.log(`  git commit -am "Bump version to ${newVersion}"`);
+        console.log(`  git commit -am "Release version ${newVersion}"`);
         console.log(`  npm run version:tag`);
         break;
         
@@ -348,16 +417,22 @@ function main() {
         console.log(versionManager.currentVersion);
         break;
         
+      case 'changelog':
+        const changelogVersion = args[1] || versionManager.currentVersion;
+        versionManager.updateChangelog(changelogVersion);
+        break;
+        
       default:
         console.log(`oh-my-colab Version Manager
 
 Usage:
-  npm run version:check        Check version consistency across all files
-  npm run version:fix          Sync all versions to package.json
-  npm run version:set <ver>    Set version across all files
-  npm run version:bump [type]  Bump version (patch|minor|major)
-  npm run version:tag [ver]    Create git tag for release
-  npm run version:current      Show current version
+  npm run version:check          Check version consistency across all files
+  npm run version:fix            Sync all versions to package.json
+  npm run version:set <ver>      Set version across all files
+  npm run version:bump [type]    Bump version (patch|minor|major)
+  npm run version:tag [ver]      Create git tag for release
+  npm run version:current        Show current version
+  npm run version:changelog      Update CHANGELOG.md for current version
 
 Examples:
   npm run version:check
