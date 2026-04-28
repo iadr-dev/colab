@@ -1,0 +1,54 @@
+{
+  "_comment": "Human-editable keyword trigger map. Add your team's custom triggers below.",
+  "_format": "keyword → { skill|workflow|agent, mode, options }",
+
+  "explore":          { "skill": "explore-codebase",              "mode": "single" },
+  "explore codebase": { "skill": "explore-codebase",              "mode": "single" },
+  "understand":       { "skill": "explore-codebase",              "mode": "single" },
+
+  "plan this":        { "skill": "writing-plans",                 "mode": "pipeline" },
+  "plan ":            { "skill": "writing-plans",                 "mode": "pipeline" },
+  "write a plan":     { "skill": "writing-plans",                 "mode": "pipeline" },
+  "design this":      { "workflow": "PLAN",                       "mode": "pipeline" },
+
+  "build":            { "workflow": "BUILD",                      "mode": "dispatch" },
+  "implement":        { "workflow": "BUILD",                      "mode": "dispatch" },
+
+  "autopilot":        { "workflow": "PLAN+BUILD+REVIEW",          "mode": "chain",       "planGate": true },
+  "auto pilot":       { "workflow": "PLAN+BUILD+REVIEW",          "mode": "chain",       "planGate": true },
+  "full auto":        { "workflow": "PLAN+BUILD+REVIEW",          "mode": "chain",       "planGate": false },
+
+  "ralph":            { "workflow": "BUILD",                      "mode": "persistence", "stopOnBlocked": 3 },
+  "keep going":       { "workflow": "BUILD",                      "mode": "persistence", "stopOnBlocked": 3 },
+
+  "review":           { "skill": "requesting-code-review",        "mode": "single" },
+  "code review":      { "skill": "requesting-code-review",        "mode": "single" },
+  "check this":       { "skill": "requesting-code-review",        "mode": "single" },
+
+  "ship":             { "workflow": "SHIP",                       "mode": "single" },
+  "ship it":          { "workflow": "SHIP",                       "mode": "single" },
+  "finish branch":    { "workflow": "SHIP",                       "mode": "single" },
+
+  "retro":            { "skill": "retrospective",                 "mode": "single" },
+  "retrospective":    { "skill": "retrospective",                 "mode": "single" },
+
+  "tdd":              { "skill": "test-driven-development",       "mode": "enforce" },
+  "test first":       { "skill": "test-driven-development",       "mode": "enforce" },
+
+  "debug":            { "skill": "systematic-debugging",          "mode": "single" },
+  "why is":           { "skill": "systematic-debugging",          "mode": "single" },
+  "not working":      { "skill": "systematic-debugging",          "mode": "single" },
+  "broken":           { "skill": "systematic-debugging",          "mode": "single" },
+
+  "handoff":          { "agent": "collaborator",                  "mode": "single" },
+  "handing off":      { "agent": "collaborator",                  "mode": "single" },
+  "picking up":       { "agent": "collaborator",                  "mode": "single" },
+
+  "discipline":       { "skill": "ohc-coding-discipline",         "mode": "enforce" },
+  "scope check":      { "script": "skills/ohc-coding-discipline/scripts/scope-check.sh" },
+
+  "_custom": {
+    "_comment": "Add your team's custom triggers here. Same format as above.",
+    "_example": "\"deploy staging\": { \"workflow\": \"SHIP\", \"mode\": \"single\" }"
+  }
+}
