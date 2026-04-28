@@ -1,0 +1,16 @@
+# Default — all files
+* @iadr-dev
+
+# Skills require extra review for line count and structure
+skills/ @iadr-dev
+
+# Platform manifests require cross-platform testing
+.claude-plugin/ @iadr-dev
+.cursor-plugin/ @iadr-dev
+gemini-extension.json @iadr-dev
+
+# Hooks affect all users — senior review required
+hooks/ @iadr-dev
+
+# Templates affect every new install
+templates/ @iadr-dev
