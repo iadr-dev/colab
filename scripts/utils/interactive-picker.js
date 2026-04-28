@@ -20,13 +20,26 @@ function picker({ title, subtitle, options, multiSelect = false, defaults = [] }
     const W = 52;
     const bar = '═'.repeat(W - 2);
 
+    let firstRender = true;
+    const linesToClear = 5 + options.length;
+
     function render() {
-      stdout.write('\x1B[?25l\x1B[2J\x1B[H');
+      if (!firstRender) {
+        readline.moveCursor(stdout, 0, -linesToClear);
+      }
+      firstRender = false;
+
+      stdout.write('\x1B[?25l');
       stdout.write(`╔${bar}╗\n║  ${title.padEnd(W - 4)}║\n║  ${subtitle.padEnd(W - 4)}║\n╠${bar}╣\n`);
       options.forEach((opt, i) => {
         const sel = selected.has(opt);
         const cur = i === cursor;
-        const mark = multiSelect ? (sel ? '[✓]' : '[ ]') : (cur ? ' ▶ ' : '   ');
+        let mark;
+        if (multiSelect) {
+          mark = (cur ? '▶ ' : '  ') + (sel ? '[✓]' : '[ ]');
+        } else {
+          mark = cur ? ' ▶ ' : '   ';
+        }
         stdout.write(`║  ${(mark + ' ' + opt).padEnd(W - 4)}║\n`);
       });
       stdout.write(`╚${bar}╝\n`);
