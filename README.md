@@ -45,18 +45,16 @@ ohc setup
 
 ### Cursor
 
-Tell your Cursor agent:
-
-```
-Fetch and follow https://raw.githubusercontent.com/iadr-dev/colab/main/.opencode/INSTALL.md
+```bash
+npm install -g @iadr-dev/colab
+ohc setup
 ```
 
 ### Antigravity
 
-Tell your Antigravity agent:
-
-```
-Fetch and follow https://raw.githubusercontent.com/iadr-dev/colab/main/.opencode/INSTALL.md
+```bash
+npm install -g @iadr-dev/colab
+ohc setup
 ```
 
 ### Codex CLI
@@ -68,7 +66,15 @@ Fetch and follow https://raw.githubusercontent.com/iadr-dev/colab/main/.codex-bo
 ### Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/iadr-dev/colab
+npm install -g @iadr-dev/colab
+ohc setup
+```
+
+### OpenCode
+
+```bash
+npm install -g @iadr-dev/colab
+ohc setup
 ```
 
 ---
