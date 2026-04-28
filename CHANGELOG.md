@@ -10,6 +10,14 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.2.1] — 2026-04-28
+
+### Fixed
+
+- **CI/CD publish flow** — added `publishConfig` and GitHub Action scope mapping to resolve 404 errors during scoped package publication
+
+---
+
 ## [0.2.0] — 2026-04-28
 
 ### Added
@@ -106,6 +114,7 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/iadr-dev/colab/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/iadr-dev/colab/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/iadr-dev/colab/releases/tag/v0.1.0
