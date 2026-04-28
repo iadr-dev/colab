@@ -60,7 +60,7 @@ echo "✗ Failed:  ${FAILED:-?}"
 echo "⏭ Skipped: ${SKIPPED:-?}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-if [ "${FAILED:-0}" -gt 0 ] || [ "${SKIPPED:-0}" -gt 0 ]; then
+if [ "${FAILED:-0}" -gt 0 ] || [ "${SKIPPED:-0}" -gt 0 ] || [ "$EXIT_CODE" -ne 0 ]; then
   echo "❌ FAILED — fix failing/skipped tests before claiming done"
   exit 1
 else
