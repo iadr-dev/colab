@@ -29,7 +29,7 @@ fi
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "—")
 
 # Parallel agents + worktrees
-AGENT_COUNT=$(ls "$OHC_DIR/state/" 2>/dev/null | grep -c "^parallel-" || echo "0")
+AGENT_COUNT=$(find "$OHC_DIR/state/" -maxdepth 1 -name "parallel-*" 2>/dev/null | wc -l | tr -d ' ')
 WORKTREE_COUNT=$(git worktree list 2>/dev/null | grep -c "ohc/" || echo "0")
 
 # MCP servers (from claude mcp list output)
