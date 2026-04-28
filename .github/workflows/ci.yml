@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  skill-line-count:
+    name: SKILL.md ≤ 200 lines
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check all SKILL.md files
+        run: |
+          FAILED=0
+          for f in skills/*/SKILL.md; do
+            LINES=$(wc -l < "$f")
+            if [ "$LINES" -gt 200 ]; then
+              echo "✗ $f — $LINES lines (limit: 200)"
+              FAILED=1
+            else
+              echo "✓ $f ($LINES lines)"
+            fi
+          done
+          exit $FAILED
+
+  validate-frontmatter:
+    name: Validate frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skills frontmatter
+        run: |
+          FAILED=0
+          for f in skills/*/SKILL.md; do
+            head -1 "$f" | grep -q "^---" || { echo "✗ $f missing ---"; FAILED=1; continue; }
+            grep -q "^name:" "$f"        || { echo "✗ $f missing name:"; FAILED=1; continue; }
+            grep -q "^description:" "$f" || { echo "✗ $f missing description:"; FAILED=1; continue; }
+            echo "✓ $f"
+          done
+          exit $FAILED
+      - name: Agent files
+        run: |
+          FAILED=0
+          for f in agents/*.md; do
+            grep -q "^model:" "$f"    || { echo "✗ $f missing model:"; FAILED=1; }
+            grep -q "^triggers:" "$f" || { echo "✗ $f missing triggers:"; FAILED=1; }
+            [ $FAILED -eq 0 ] && echo "✓ $f"
+          done
+          exit $FAILED
+      - name: Command files
+        run: |
+          FAILED=0
+          for f in commands/*.md; do
+            head -1 "$f" | grep -q "^---"     || { echo "✗ $f missing frontmatter"; FAILED=1; }
+            grep -q "^description:" "$f" || { echo "✗ $f missing description:"; FAILED=1; }
+            [ $FAILED -eq 0 ] && echo "✓ $f"
+          done
+          exit $FAILED
+
+  validate-json:
+    name: Validate JSON files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Check JSON
+        run: |
+          FAILED=0
+          for f in package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json \
+                   .cursor-plugin/manifest.json gemini-extension.json hooks/keyword-map.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" 2>/dev/null \
+              && echo "✓ $f" || { echo "✗ $f — invalid JSON"; FAILED=1; }
+          done
+          exit $FAILED
+
+  js-syntax:
+    name: JS syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Check JS files
+        run: |
+          FAILED=0
+          for f in hooks/on-session-start.js hooks/on-pre-tool.js \
+                   hooks/on-post-tool.js hooks/on-stop.js \
+                   scripts/team.js scripts/skill.js scripts/notify.js \
+                   scripts/cursor-sync.js scripts/setup/index.js \
+                   scripts/utils/interactive-picker.js \
+                   scripts/utils/masked-input.js \
+                   scripts/utils/project-scanner.js; do
+            node --check "$f" 2>/dev/null \
+              && echo "✓ $f" || { echo "✗ $f — syntax error"; FAILED=1; }
+          done
+          exit $FAILED
+
+  shell-check:
+    name: Shell script lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y shellcheck -q
+      - name: Check shell scripts
+        run: |
+          shellcheck scripts/hud/ohc-hud.sh
+          shellcheck skills/ohc-coding-discipline/scripts/scope-check.sh
+          shellcheck skills/test-driven-development/scripts/verify-tests-pass.sh
+          shellcheck skills/finishing-a-branch/scripts/pre-merge-check.sh
+          echo "✓ All shell scripts pass shellcheck"
+
+  publish-check:
+    name: npm pack dry-run
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install
+      - run: npm pack --dry-run

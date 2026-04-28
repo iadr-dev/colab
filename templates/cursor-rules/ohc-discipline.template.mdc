@@ -1,0 +1,32 @@
+---
+description: oh-my-colab coding discipline — anti-overengineering rules
+alwaysApply: true
+---
+
+# Coding Discipline (Karpathy-extended)
+
+## 1. Explicit Assumptions
+State assumptions before writing code. If multiple interpretations exist and
+consequence is >15min of work: ask. Present interpretations with options, don't
+pick silently. Name what's unclear — don't infer forward.
+
+## 2. Minimal Scope
+Write minimum code that solves the stated problem. Nothing beyond what was asked.
+No abstractions for single-use code. No future-proofing nobody requested.
+Every changed line traces to the user's explicit request.
+Out-of-scope issues: log to .ohc/notepad.md, do not fix.
+
+## 3. Surgical Changes
+Remove only what YOUR changes made unused. Don't remove pre-existing dead code.
+Small logical commits. Each commit = one logical change.
+Every changed line explainable from the commit message alone.
+
+## 4. Goal-Driven Execution
+Write explicit verifiable success criterion before any code.
+"Tests pass" is not a criterion. "All 23 auth.test.ts cases pass with 0 skips" is.
+Loop until criterion is met. Never claim done without verifying.
+
+## OHC Extensions
+- Workflow gate: >30min task → confirm plan in .ohc/plans/ exists first
+- Team handoff: finish work → update .ohc/notepad.md for next developer
+- Scope verification: after finishing → confirm changed files match task scope
