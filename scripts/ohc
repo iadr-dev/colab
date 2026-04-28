@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+/**
+ * ohc — oh-my-colab CLI entry point
+ * Usage: ohc <command> [args]
+ */
+const path = require('path');
+const PKG_ROOT = path.join(__dirname, '..');
+const [,, cmd, ...args] = process.argv;
+
+const COMMANDS = {
+  setup:        'Interactive 6-screen onboarding',
+  team:         'Spawn N parallel agents: ohc team N:provider "task"',
+  parallel:     'Alias for ohc team',
+  skill:        'Manage skills: ohc skill list | promote <n> | draft <n>',
+  notify:       'Send notification: ohc notify "msg" | --summary',
+  'cursor-sync':'Push team rules to Cursor Dashboard',
+  version:      'Show version',
+  help:         'Show this help',
+};
+
+if (!cmd || cmd === 'help' || cmd === '--help') {
+  console.log('\n  🧠 oh-my-colab CLI (@iadr/colab)\n');
+  for (const [c, d] of Object.entries(COMMANDS))
+    console.log(`  ohc ${c.padEnd(14)} ${d}`);
+  console.log('\n  GitHub: https://github.com/iadr-dev/colab\n');
+  process.exit(0);
+}
+
+if (cmd === 'version' || cmd === '--version') {
+  const pkg = require(path.join(PKG_ROOT, 'package.json'));
+  console.log(pkg.version);
+  process.exit(0);
+}
+
+const routes = {
+  setup:          () => require(path.join(PKG_ROOT, 'scripts/setup/index.js')),
+  team:           () => require(path.join(PKG_ROOT, 'scripts/team.js'))(args),
+  parallel:       () => require(path.join(PKG_ROOT, 'scripts/team.js'))(args),
+  skill:          () => require(path.join(PKG_ROOT, 'scripts/skill.js'))(args),
+  notify:         () => require(path.join(PKG_ROOT, 'scripts/notify.js'))(args),
+  'cursor-sync':  () => require(path.join(PKG_ROOT, 'scripts/cursor-sync.js'))(args),
+};
+
+const fn = routes[cmd];
+if (!fn) {
+  console.error(`  Unknown command: ${cmd}\n  Run ohc help for usage.`);
+  process.exit(1);
+}
+fn();
