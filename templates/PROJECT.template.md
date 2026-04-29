@@ -32,7 +32,9 @@
 - **Error handling**: {{error_handling_pattern}}
 
 ## Known Gotchas
-<!-- RETRO appends: - [YYYY-MM-DD] Description → WORKAROUND: solution -->
+<!-- Auto-appended by on-post-tool-failure.js when a Bash command fails repeatedly. -->
+<!-- Also appended by RETRO workflow. -->
+<!-- Format: - [YYYY-MM-DD] what failed → WORKAROUND: solution -->
 
 ## Active Plans
 <!-- Links to .ohc/plans/*.md files in progress -->

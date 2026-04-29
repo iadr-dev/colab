@@ -1,0 +1,16 @@
+{
+  "_comment": "Seed file for .ohc/project-memory.json — tracks distilled project knowledge",
+  "_managed_by": "scripts/memory.js",
+  "project": "{{project_name}}",
+  "created": "{{install_date}}",
+  "last_updated": null,
+  "sessions_count": 0,
+  "learnings": [],
+  "recurring_failures": [],
+  "stack_notes": {
+    "_comment": "Key project-specific gotchas and setup notes discovered during sessions"
+  },
+  "agent_preferences": {
+    "_comment": "Learned per-agent preferences (e.g. executor prefers X, reviewer always flags Y)"
+  }
+}
