@@ -49,6 +49,10 @@ Write findings to .ohc/PROJECT.md:
 
 ## Run the Generator
 ```bash
+# Node (preferred — zero Python dependency):
+node skills/explore-codebase/scripts/generate-project-map.js
+
+# Python fallback (if Node 18+ unavailable):
 python3 skills/explore-codebase/scripts/generate-project-map.py
 ```
 Auto-detects stack and fills the tech stack table in PROJECT.md.

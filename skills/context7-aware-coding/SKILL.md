@@ -15,11 +15,18 @@ Never use training data for external library API signatures. Always fetch curren
 
 Before writing any code that calls an external library:
 1. Identify the library and the specific API needed
-2. Fetch current docs via Context7
-3. Use the fetched signature — not your memory
+2. **Check `.ohc/research/` cache first** — `research.lookup(library, topic)`.
+   Fresh hit → use cached body, do not re-fetch.
+3. On miss or stale hit: fetch current docs via Context7
+4. After fetch: `research.save({library, topic, source:'context7', version, payload})`
+5. Use the fetched signature — not your memory
 
 This prevents: hallucinated method names, deprecated APIs, wrong parameter order,
 missing required fields, version incompatibilities.
+
+The cache is cross-session (survives `/clear` and new sessions) and indexed into
+session start via the `<ohc_research_index>` reminder, so the agent knows upfront
+what's already been researched.
 
 ## How to Use Context7
 
@@ -59,6 +66,16 @@ the normal docs response plus official docs/source as the fallback.
 5. Flag explicitly: "Could not find current docs for X. Based on v{N} docs: ..."
 
 Never silently guess. Always flag when docs were unavailable.
+
+## Cache audit (verified-working)
+
+After executor/verifier confirms the research produced working code:
+```
+ohc research verify <library> <topic> <commit-sha>
+```
+This stamps `verified_working: true` + the commit SHA onto the cached entry so
+the reviewer can audit which design decisions rest on which fetched docs, and
+so subsequent sessions can trust that entry more strongly.
 
 ## MCP Install (if not already configured)
 ```bash

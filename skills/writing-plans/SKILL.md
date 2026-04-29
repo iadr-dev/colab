@@ -20,6 +20,10 @@ Clarify before designing:
 4. **Are there existing patterns?** — check PROJECT.md conventions
 5. **What could go wrong?** — risks to address upfront
 
+Use `.ohc/PROJECT.md` as the primary project context. Also use optional domain
+docs (`CONTEXT.md` / `CONTEXT-MAP.md`) when present. If the plan creates a
+durable architectural decision, record whether an ADR is needed.
+
 ## Step 2: Approach Selection
 
 Propose 2-3 approaches with tradeoffs. Get user confirmation on approach before
@@ -46,3 +50,4 @@ Use template from assets/plan-template.md.
 
 See references/plan-template.md for canonical format.
 See references/task-decomposition.md for splitting rules.
+See references/domain-docs.md for glossary and ADR-aware planning.
