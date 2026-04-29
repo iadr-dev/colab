@@ -43,14 +43,6 @@ fi
 NOTEPAD_ITEMS="0"
 [ -f "$NOTEPAD" ] && NOTEPAD_ITEMS=$(grep -c "^- \[ \]" "$NOTEPAD" 2>/dev/null || echo "0")
 
-# Notification status
-NOTIFY="off"
-CONFIG="$HOME/.ohc/config.json"
-if [ -f "$CONFIG" ] && command -v python3 &>/dev/null; then
-  PROVIDER=$(python3 -c "import json; d=json.load(open('$CONFIG')); print(d.get('notifications',{}).get('provider','none'))" 2>/dev/null || echo "none")
-  [ "$PROVIDER" != "none" ] && NOTIFY="$PROVIDER ✓" || NOTIFY="off"
-fi
-
 # ── Render ───────────────────────────────────────────────────────────────────
 case "$OHC_HUD_STYLE" in
   minimal)
@@ -64,6 +56,5 @@ case "$OHC_HUD_STYLE" in
     echo "🧠 ohc $S workflow: $WF $S agent: $AGENT $S task: $TASK"
     echo "📊 plan: $PLAN_STEP steps $S notepad: $NOTEPAD_ITEMS open items"
     echo "🔀 branch: $BRANCH $S agents: $AGENT_COUNT running $S worktrees: $WORKTREE_COUNT $S MCP: $MCP_NAMES"
-    echo "⚡ notifications: $NOTIFY"
     ;;
 esac

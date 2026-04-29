@@ -8,14 +8,13 @@ const PKG_ROOT = path.join(__dirname, '..');
 const [,, cmd, ...args] = process.argv;
 
 const COMMANDS = {
-  setup:        'Interactive 6-screen onboarding',
-  team:         'Spawn N parallel agents: ohc team N:provider "task"',
-  parallel:     'Alias for ohc team',
-  skill:        'Manage skills: ohc skill list | promote <n> | draft <n>',
-  notify:       'Send notification: ohc notify "msg" | --summary',
-  'cursor-sync':'Push team rules to Cursor Dashboard',
-  version:      'Show version',
-  help:         'Show this help',
+  setup:    'Interactive onboarding',
+  team:     'Spawn N parallel agents: ohc team N:provider "task"',
+  parallel: 'Alias for ohc team',
+  skill:    'Manage skills: ohc skill list | promote <n> | draft <n>',
+  research: 'Research cache: ohc research list | show | search | prune | clear | verify',
+  version:  'Show version',
+  help:     'Show this help',
 };
 
 if (!cmd || cmd === 'help' || cmd === '--help') {
@@ -33,12 +32,11 @@ if (cmd === 'version' || cmd === '--version') {
 }
 
 const routes = {
-  setup:          () => require(path.join(PKG_ROOT, 'scripts/setup/index.js')),
-  team:           () => require(path.join(PKG_ROOT, 'scripts/team.js'))(args),
-  parallel:       () => require(path.join(PKG_ROOT, 'scripts/team.js'))(args),
-  skill:          () => require(path.join(PKG_ROOT, 'scripts/skill.js'))(args),
-  notify:         () => require(path.join(PKG_ROOT, 'scripts/notify.js'))(args),
-  'cursor-sync':  () => require(path.join(PKG_ROOT, 'scripts/cursor-sync.js'))(args),
+  setup:    () => require(path.join(PKG_ROOT, 'scripts/setup/index.js'))(),
+  team:     () => require(path.join(PKG_ROOT, 'scripts/team/index.js'))(args),
+  parallel: () => require(path.join(PKG_ROOT, 'scripts/team/index.js'))(args),
+  skill:    () => require(path.join(PKG_ROOT, 'scripts/skill.js'))(args),
+  research: () => require(path.join(PKG_ROOT, 'scripts/research-cli.js'))(args),
 };
 
 const fn = routes[cmd];
