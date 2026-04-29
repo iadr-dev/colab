@@ -21,6 +21,21 @@ When a novel, reusable pattern emerges:
 Write to .ohc/skills/<pattern-name>.md (under 100 lines).
 RETRO will review and promote if valid via `ohc skill promote <n>`.
 
+## Research Cache (cross-session)
+Context7/Brave/GitHub doc fetches persist to .ohc/research/<library>--<topic>.md.
+- Lookup before fetching: `require('./scripts/research').lookup(lib, topic)`.
+- On fetch: `research.save({library, topic, payload, source, version})`.
+- After code built on that research lands: `ohc research verify <library> <topic> <commit-sha>`.
+- Default TTL 30d; stale entries are pruned at session end.
+
+## Team Artifacts (parallel workers)
+When running as a `/team` worker, DO NOT append to .ohc/notepad.md directly —
+concurrent writes race. Instead:
+- Per-worker notes: .ohc/state/team/<id>/workers/<name>/notes.md
+- Structured result: .ohc/state/team/<id>/workers/<name>/RESULT.json
+  `{status, tests:{passed,failed,skipped}, files_changed, artifacts, notes, completedAt}`
+The orchestrator blocks team-exec → team-verify until every worker has RESULT.json.
+
 ## Cross-Session
 The agent reads .ohc/notepad.md at session start.
 Write it for your teammate, not yourself. Plain language, no jargon.

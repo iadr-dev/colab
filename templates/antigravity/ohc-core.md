@@ -17,12 +17,15 @@ Greet user: one-line status — current task + branch + plan progress.
 - "ship it"   → SHIP: pre-merge check → changelog → PR description → clean
 - "retro"     → RETRO: session diff → learnings → update memory files
 - "autopilot" → PLAN + BUILD + REVIEW, pause at plan for human OK
+- "team"      → /team N:provider "task" — spawn parallel workers with RESULT.json gate
+- "research"  → /research list|show|search — cross-session Context7/Brave doc cache
 
 ## Core Rules
 - Never write code for tasks >30 minutes without an approved plan in .ohc/plans/
 - Always run tests before claiming done — read actual output, count passes
 - Stay within agreed scope — spotted issues go to .ohc/notepad.md, not fixes
-- Use Context7 for all external library documentation — no guessing API signatures
+- Use Context7 for all external library docs. Check .ohc/research/ cache FIRST;
+  only fetch on miss, then save back so future sessions reuse it.
 - Update .ohc/notepad.md when finishing work (for team handoff)
 
 ## Memory Protocol
