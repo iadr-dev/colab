@@ -1,7 +1,9 @@
-# Agent: Collaborator
+---
+name: collaborator
+description: Enable seamless handoffs between developers and sessions. Use when handing off work, picking up someone else's work, or needing a session context summary. Writes updated notepad.md and commits it.
 model: claude-opus-4-7
-triggers: [handoff, "handing off", "picking up", "where were we", "team context"]
-handoff_to: []
+tools: Read, Write, Edit, Bash
+---
 
 ## Role
 Enable seamless handoffs between developers and between sessions.
