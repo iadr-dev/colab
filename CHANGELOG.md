@@ -10,6 +10,32 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.0] — 2026-04-29
+
+### Added
+
+- Claude Code `hooks.json` registry plus lifecycle hooks (permission requests, compact boundaries, session end, subagent start/stop, user prompt)
+- Modular `scripts/team/` implementation (tmux, worktree, native orchestration) replacing the single-file team runner
+- CLI helpers: `memory.js`, `ralph.js`, `research.js`, `research-cli.js`
+- Slash commands for `caveman`, `ralph`, and `research`
+- Skills for `caveman` and `ralph`; expanded reference docs (domain docs, architecture vocabulary, feedback loops, behavior-first testing)
+- Smoke tests under `tests/smoke`
+- Templates `MEMORY.template.json` and `SELF-EVAL.template.md`
+
+### Changed
+
+- Agent prompts refreshed across `agents/*.md`
+- `ohc setup` emits Claude Code `statusLine` as a `{ type, command, refreshInterval }` object (compatible with current Claude Code settings validation)
+- HUD script, keyword map, and hook script behavior updates
+- README and GitHub security policy copy
+
+### Removed
+
+- `commands/ask.md`
+- `scripts/cursor-sync.js` and `scripts/notify.js`; team orchestration consolidated under `scripts/team/`
+
+---
+
 ## [0.3.1] — 2026-04-28
 
 ### Fixed
@@ -148,7 +174,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/iadr-dev/colab/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/iadr-dev/colab/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/iadr-dev/colab/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/iadr-dev/colab/compare/v0.2.0...v0.2.1
