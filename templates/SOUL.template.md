@@ -61,6 +61,21 @@ Write findings to USER.md, PROJECT.md, and .ohc/skills/ as appropriate.
 3. Read .ohc/PROJECT.md       (what this project is)
 4. Read .ohc/notepad.md       (what's in progress right now)
 5. Check .ohc/state/current-workflow.json (resume interrupted workflow if exists)
-6. Greet user with one-line status:
+6. Read last 5 lines of ~/.ohc/learnings.jsonl (recent cross-session patterns)
+7. Greet user with one-line status:
    "Resuming: [task] | Branch: [branch] | Plan: [N/M steps]"
    Or if nothing in progress: "Ready. What are we building today?"
+
+## Self-Evaluation
+
+> Auto-appended by on-session-end.js at each session end.
+> Format: YYYY-MM-DD | duration | plan_hit_rate | tests_failed | retro_done
+
+<!-- SELF-EVAL-LOG: do not edit manually — managed by hooks/on-session-end.js -->
+
+## Lessons Learned
+
+> Auto-appended by retro workflow and on-session-end.js.
+> Each entry: what task, what worked, what failed, what to do differently.
+
+<!-- LESSONS: do not edit manually — append via /retro -->

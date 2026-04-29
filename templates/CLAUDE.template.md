@@ -27,17 +27,17 @@ Route tasks to agents by type. Model assignment is fixed — do not override.
 
 | Agent       | Model              | Purpose                                      |
 |-------------|--------------------|----------------------------------------------|
-| planner     | claude-opus-4-6    | Decompose goals into verifiable tasks        |
+| planner     | claude-opus-4-7    | Decompose goals into verifiable tasks        |
 | executor    | claude-sonnet-4-6  | Write code following the active plan         |
-| reviewer    | claude-opus-4-6    | Two-pass review: spec compliance then quality|
+| reviewer    | claude-opus-4-7    | Two-pass review: spec compliance then quality|
 | verifier    | claude-sonnet-4-6  | Run tests, read output, report exact counts  |
 | debugger    | claude-sonnet-4-6  | Hypothesis-driven root cause analysis        |
-| architect   | claude-opus-4-6    | System design, write ADRs                    |
+| architect   | claude-opus-4-7    | System design, write ADRs                    |
 | researcher  | claude-haiku-4-5   | Context7 + Brave Search, live docs           |
 | writer      | claude-haiku-4-5   | Changelogs, PR descriptions, docs            |
-| collaborator| claude-sonnet-4-6  | Team handoffs, update notepad.md             |
+| collaborator| claude-opus-4-7    | Team handoffs, update notepad.md             |
 
-Model routing rule: opus for planner/reviewer/architect only.
+Model routing rule: opus for planner/reviewer/architect/collaborator only.
 Haiku for researcher/writer only. Sonnet for all others.
 </ohc_agent_catalog>
 
@@ -127,7 +127,7 @@ Active hooks inject <system-reminder> tags mid-session:
 - on-session-start: loads memory files, shows status summary
 - on-pre-tool: keyword detection, scope validation, skill injection
 - on-post-tool: state logging, notepad update, plan step tracking
-- on-stop: session summary, notifications, retro prompt (if session >30min)
+- on-stop: session summary, retro prompt (if session >30min)
 
 When you receive a <system-reminder> tag: read it fully before proceeding.
 </ohc_hooks_protocol>

@@ -21,15 +21,16 @@
 **Commit style**: {{commit_style}}
 **Review style**: {{review_style}}
 
-## Notification Target
-**Provider**: {{notification_provider}}
-**Destination**: {{notification_destination}}
-
 ## Known Strengths
 <!-- RETRO populates — patterns where you consistently excel -->
 
-## Known Friction Areas
-<!-- RETRO populates — patterns where sessions get stuck -->
+## Recurring Friction
+<!-- Auto-appended by on-session-end.js and RETRO — patterns where sessions get stuck or slow down -->
+<!-- Format: - [YYYY-MM-DD] description of friction pattern -->
+
+## Velocity Patterns
+<!-- RETRO populates — approaches that consistently produce fast, clean results -->
+<!-- Format: - [YYYY-MM-DD] what works well and in what context -->
 
 ## Learned Preferences
 <!-- RETRO populates — style/approach preferences from session patterns -->
