@@ -25,6 +25,21 @@ alwaysApply: true
 - For Cursor-specific learnings: use /Generate Cursor Rules
 - Update ~/.ohc/USER.md if a personal preference was discovered
 
+## Research Cache (cross-session)
+Context7/Brave/GitHub doc fetches persist to .ohc/research/<library>--<topic>.md.
+- Lookup before fetching: `require('./scripts/research').lookup(lib, topic)`.
+- On fetch: `research.save({library, topic, payload, source, version})`.
+- After code built on that research lands: `ohc research verify <library> <topic> <commit-sha>`.
+- Default TTL 30d; `on-session-end.js` prunes stale entries.
+
+## Team Artifacts (parallel workers)
+When running as a `/team` worker, DO NOT append to .ohc/notepad.md directly —
+concurrent writes race. Instead:
+- Per-worker notes: .ohc/state/team/<id>/workers/<name>/notes.md
+- Structured result: .ohc/state/team/<id>/workers/<name>/RESULT.json
+  `{status, tests:{passed,failed,skipped}, files_changed, artifacts, notes, completedAt}`
+The orchestrator refuses to advance past team-exec without every RESULT.json.
+
 ## Cross-Session Memory
 notepad.md is read at session start. Write it for a teammate, not yourself.
 Avoid agent jargon. Use plain language.

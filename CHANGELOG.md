@@ -8,6 +8,10 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### Changed
+
+- Cursor and Antigravity templates — routing hints for `/team` and `/research`, research-cache-first Context7 usage, and memory docs for shared `.ohc/research/` plus parallel-worker RESULT.json artifacts
+
 ---
 
 ## [0.4.0] — 2026-04-29
