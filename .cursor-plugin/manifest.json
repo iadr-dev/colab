@@ -1,12 +1,11 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Team-first AI coding workflows for Cursor",
   "rules": [
     ".cursor/rules/ohc-core.mdc",
     ".cursor/rules/ohc-memory.mdc",
     ".cursor/rules/ohc-discipline.mdc",
     ".cursor/rules/ohc-tdd.mdc"
-  ],
-  "commands": ".cursor/commands/"
+  ]
 }

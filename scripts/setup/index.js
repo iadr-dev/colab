@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * setup/index.js — oh-my-colab interactive onboarding
- * 6 screens: platforms → team → workflow → MCP → notifications → HUD
+ * 5 screens: platforms → team → workflow → MCP → HUD
  */
 
 const fs   = require('fs');
@@ -18,12 +18,12 @@ const PKG_ROOT = path.join(__dirname, '../..');
 const MCP_SERVERS = [
   { name: 'context7',     label: 'Context7      — live library docs (free; key optional)',  needsKey: 'optional', keyName: 'CONTEXT7_API_KEY',                command: 'npx', args: ['-y', '@upstash/context7-mcp'] },
   { name: 'github',       label: 'GitHub MCP    — repos, PRs, issues, CI',                  needsKey: true,       keyName: 'GITHUB_PERSONAL_ACCESS_TOKEN',      command: 'npx', args: ['-y', '@modelcontextprotocol/server-github'] },
-  { name: 'brave-search', label: 'Brave Search  — web search',                              needsKey: true,       keyName: 'BRAVE_API_KEY',                     command: 'npx', args: ['-y', '@anthropic/mcp-brave-search'] },
-  { name: 'playwright',   label: 'Playwright    — browser automation, e2e testing',         needsKey: false,      command: 'npx', args: ['-y', '@anthropic/mcp-playwright'] },
+  { name: 'brave-search', label: 'Brave Search  — web search',                              needsKey: true,       keyName: 'BRAVE_API_KEY',                     command: 'npx', args: ['-y', '@modelcontextprotocol/server-brave-search'] },
+  { name: 'playwright',   label: 'Playwright    — browser automation, e2e testing',         needsKey: false,      command: 'npx', args: ['-y', '@playwright/mcp'] },
   { name: 'firecrawl',    label: 'Firecrawl     — web scraping',                            needsKey: true,       keyName: 'FIRECRAWL_API_KEY',                 command: 'npx', args: ['-y', 'firecrawl-mcp'] },
-  { name: 'linear',       label: 'Linear        — project management',                      needsKey: true,       keyName: 'LINEAR_API_KEY',                    command: 'npx', args: ['-y', '@linear/mcp-server'] },
+  { name: 'linear',       label: 'Linear        — project management',                      needsKey: true,       keyName: 'LINEAR_API_KEY',                    command: 'npx', args: ['-y', '@tacticlaunch/mcp-linear'] },
   { name: 'sentry',       label: 'Sentry        — error monitoring',                        needsKey: true,       keyName: 'SENTRY_AUTH_TOKEN',                 command: 'npx', args: ['-y', '@sentry/mcp-server'] },
-  { name: 'figma',        label: 'Figma         — design context',                          needsKey: true,       keyName: 'FIGMA_API_KEY',                     command: 'npx', args: ['-y', '@figma/mcp-server'] },
+  { name: 'figma',        label: 'Figma         — design context',                          needsKey: true,       keyName: 'FIGMA_API_KEY',                     command: 'npx', args: ['-y', 'figma-developer-mcp'] },
 ];
 
 async function run() {
@@ -35,23 +35,23 @@ async function run() {
 
   // Screen 1: Platforms
   const platforms = await picker({
-    title: 'oh-my-colab setup (1/6)',
+    title: 'oh-my-colab setup (1/5)',
     subtitle: 'Platforms (Space to toggle, Enter to confirm)',
-    options: ['Claude Code', 'Cursor', 'Antigravity', 'Codex CLI', 'Gemini CLI', 'OpenCode'],
+    options: ['Claude Code', 'Cursor', 'Antigravity', 'Codex CLI', 'Gemini CLI'],
     multiSelect: true,
     defaults: ['Claude Code']
   }) || ['Claude Code'];
 
   // Screen 2: Team mode
   const [teamMode] = await picker({
-    title: 'oh-my-colab setup (2/6)',
+    title: 'oh-my-colab setup (2/5)',
     subtitle: 'Team setup',
     options: ['Solo developer', 'Small team (2–10)', 'Large org (10+, Cursor Teams)'],
   }) || ['Solo developer'];
 
   // Screen 3: Workflow
   const [workflow] = await picker({
-    title: 'oh-my-colab setup (3/6)',
+    title: 'oh-my-colab setup (3/5)',
     subtitle: 'Default workflow style',
     options: ['Autopilot (plan + build + review)', 'Plan-first', 'TDD-strict', 'Freestyle'],
   }) || ['Autopilot (plan + build + review)'];
@@ -59,7 +59,7 @@ async function run() {
   // Screen 4: MCP servers
   const mcpLabels = MCP_SERVERS.map(s => s.label);
   const selectedLabels = await picker({
-    title: 'oh-my-colab setup (4/6)',
+    title: 'oh-my-colab setup (4/5)',
     subtitle: 'MCP servers (Space to toggle, Enter when done)',
     options: mcpLabels,
     multiSelect: true,
@@ -85,31 +85,24 @@ async function run() {
     }
   }
 
-  // Screen 5: Notifications
-  const [notifyChoice] = await picker({
-    title: 'oh-my-colab setup (5/6)',
-    subtitle: 'Session notifications',
-    options: ['None', 'Slack (webhook URL)', 'Discord (webhook URL)', 'Telegram (bot token)'],
-  }) || ['None'];
-
-  let notifications = { provider: 'none' };
-  if (notifyChoice !== 'None') {
-    const provider = notifyChoice.split(' ')[0].toLowerCase();
-    const { value } = await maskedInput(`${notifyChoice} selected.`, 'Enter webhook URL');
-    if (value) notifications = { provider, webhookUrl: value };
+  // Screen 5: HUD — only prompt when Claude Code is selected (only platform whose
+  // statusLine picks it up). On other platforms, still install the script so it
+  // can be used in tmux/prompt, but default to 'full' style without asking.
+  let hudStyle;
+  if (platforms.includes('Claude Code')) {
+    [hudStyle] = await picker({
+      title: 'oh-my-colab setup (5/5)',
+      subtitle: 'Status line style (Claude Code)',
+      options: ['Full (3 lines)', 'Standard (2 lines)', 'Minimal (1 line)', 'None'],
+    }) || ['Full (3 lines)'];
+  } else {
+    hudStyle = 'Full (3 lines)';
   }
-
-  // Screen 6: HUD
-  const [hudStyle] = await picker({
-    title: 'oh-my-colab setup (6/6)',
-    subtitle: 'Status line style',
-    options: ['Full (4 lines)', 'Standard (2 lines)', 'Minimal (1 line)', 'None'],
-  }) || ['Full (4 lines)'];
 
   // Install
   stdout.write('\x1B[2J\x1B[H  🧠 oh-my-colab — Installing...\n  ─────────────────────────────────────\n\n');
 
-  const config = { platforms, teamMode, workflow, selectedMcp, mcpKeys, notifications, hudStyle, project };
+  const config = { platforms, teamMode, workflow, selectedMcp, mcpKeys, hudStyle, project };
 
   const steps = [
     ['~/.ohc/ global dirs',           () => initGlobal()],
@@ -117,15 +110,14 @@ async function run() {
     ['SOUL.md',                        () => genSoul()],
     ['USER.md',                        () => genUser(config)],
     ['PROJECT.md',                     () => genProject(config)],
-    (platforms.includes('Claude Code') || platforms.includes('Codex CLI') || platforms.includes('OpenCode'))
+    (platforms.includes('Claude Code') || platforms.includes('Codex CLI') || platforms.includes('Cursor'))
                                        ? ['AGENTS.md / CLAUDE.md',          () => genAgents(config)] : null,
     platforms.includes('Claude Code')  ? ['~/.claude/settings.json',        () => genSettings(config)] : null,
-    platforms.includes('Claude Code')  ? ['.claude/hooks/ + commands/',     () => writeClaudeFiles()] : null,
-    platforms.includes('Cursor')       ? ['.cursor/rules/ + commands/', () => writeCursor(config)] : null,
-    platforms.includes('Antigravity')  ? ['.agent/ rules/skills/workflows', () => writeAntigravity()] : null,
-    platforms.includes('Gemini CLI')   ? ['GEMINI.md + gemini-extension.json', () => writeGemini(config)] : null,
-    platforms.includes('Codex CLI')    ? ['.codex context file', () => writeCodex()] : null,
-    platforms.includes('OpenCode')     ? ['.opencode/ dirs + config', () => writeOpenCode(config)] : null,
+    platforms.includes('Claude Code')  ? ['.claude/ hooks+commands+agents+skills', () => writeClaudeFiles()] : null,
+    platforms.includes('Cursor')       ? ['.cursor/rules+mcp (+ .claude/ compat)', () => writeCursor(config)] : null,
+    platforms.includes('Antigravity')  ? ['.agent/ + ~/.gemini/antigravity/', () => writeAntigravity()] : null,
+    platforms.includes('Gemini CLI')   ? ['GEMINI.md + ~/.gemini/extensions/oh-my-colab/', () => writeGemini(config)] : null,
+    platforms.includes('Codex CLI')    ? ['~/.codex/ prompts + config.toml', () => writeCodex(config)] : null,
     platforms.includes('Claude Code')  ? ['MCP servers via claude mcp add', () => installMcp(config)] : null,
     hudStyle !== 'None'                ? ['HUD status bar',            () => writeHud(config)] : null,
     ['~/.ohc/config.json',             () => writeConfig(config)],
@@ -168,7 +160,7 @@ function genSoul() {
   if (!fs.existsSync(dest)) write(dest, tmpl('SOUL.template.md'));
 }
 
-function genUser({ project, workflow, notifications }) {
+function genUser({ project, workflow }) {
   const dest = path.join(os.homedir(), '.ohc', 'USER.md');
   if (!fs.existsSync(dest)) write(dest, fill(tmpl('USER.template.md'), {
     name: os.userInfo().username, role: 'Developer', experience: 'Intermediate',
@@ -176,9 +168,7 @@ function genUser({ project, workflow, notifications }) {
     primary_languages: project.language, frameworks: project.framework,
     test_framework: project.testRunner, package_manager: project.packageManager,
     editor: 'VS Code / Cursor', default_workflow: workflow,
-    commit_style: 'Conventional Commits', review_style: 'Thorough',
-    notification_provider: notifications.provider,
-    notification_destination: notifications.webhookUrl || 'none'
+    commit_style: 'Conventional Commits', review_style: 'Thorough'
   }));
 }
 
@@ -203,7 +193,7 @@ function genProject({ project }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.3.1', project_name: project.projectName,
+    version: '0.4.0', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -237,99 +227,132 @@ function genSettings({ teamMode, hudStyle }) {
       OHC_TEAM_MODE: teamMode.includes('Solo') ? 'solo' : 'auto',
       OHC_MAX_PARALLEL: teamMode.includes('Large') ? '8' : '4'
     },
-    ...(hudStyle !== 'None' ? { statusLine: hudPath, statusLineRefreshInterval: 2000 } : {})
+    ...(hudStyle !== 'None' ? {
+      statusLine: {
+        type: 'command',
+        command: hudPath,
+        refreshInterval: 2
+      }
+    } : {})
   }, null, 2));
   write(path.join(CWD, '.claude', 'settings.json'),
     JSON.stringify({ permissions: { allow: ['Bash','Read','Write','Edit','MultiEdit'] } }, null, 2));
 }
 
-function writeClaudeFiles() {
-  const hooksDir = path.join(CWD, '.claude', 'hooks');
-  const cmdsDir  = path.join(CWD, '.claude', 'commands');
-  mkdir(hooksDir); mkdir(cmdsDir);
-  for (const h of ['on-session-start.js','on-pre-tool.js','on-post-tool.js','on-stop.js']) {
-    const src = path.join(PKG_ROOT, 'hooks', h);
-    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(hooksDir, h));
-  }
-  for (const f of fs.readdirSync(path.join(PKG_ROOT, 'commands'))) {
-    fs.copyFileSync(path.join(PKG_ROOT, 'commands', f), path.join(cmdsDir, f));
+function copyDir(src, dst) {
+  mkdir(dst);
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name);
+    const d = path.join(dst, entry.name);
+    if (entry.isDirectory()) copyDir(s, d);
+    else if (entry.isFile()) fs.copyFileSync(s, d);
   }
 }
 
-function writeCursor() {
+function writeClaudeFiles() {
+  const hooksDir  = path.join(CWD, '.claude', 'hooks');
+  const cmdsDir   = path.join(CWD, '.claude', 'commands');
+  const agentsDir = path.join(CWD, '.claude', 'agents');
+  const skillsDir = path.join(CWD, '.claude', 'skills');
+  mkdir(hooksDir); mkdir(cmdsDir); mkdir(agentsDir); mkdir(skillsDir);
+
+  // Deploy hooks.json (Anthropic verbose format — single registration source)
+  const hooksSrc = path.join(PKG_ROOT, 'hooks', 'hooks.json');
+  if (fs.existsSync(hooksSrc)) fs.copyFileSync(hooksSrc, path.join(CWD, '.claude', 'hooks.json'));
+
+  // Copy all hook JS files
+  const allHooks = fs.readdirSync(path.join(PKG_ROOT, 'hooks'))
+    .filter(f => f.endsWith('.js'));
+  for (const h of allHooks) {
+    const src = path.join(PKG_ROOT, 'hooks', h);
+    fs.copyFileSync(src, path.join(hooksDir, h));
+  }
+
+  // Copy keyword-map.json alongside hooks
+  const kwSrc = path.join(PKG_ROOT, 'hooks', 'keyword-map.json');
+  if (fs.existsSync(kwSrc)) fs.copyFileSync(kwSrc, path.join(hooksDir, 'keyword-map.json'));
+
+  // Commands (.claude/commands/*.md → slash commands)
+  for (const f of fs.readdirSync(path.join(PKG_ROOT, 'commands'))) {
+    fs.copyFileSync(path.join(PKG_ROOT, 'commands', f), path.join(cmdsDir, f));
+  }
+
+  // Agents (.claude/agents/*.md → subagents)
+  for (const f of fs.readdirSync(path.join(PKG_ROOT, 'agents'))) {
+    fs.copyFileSync(path.join(PKG_ROOT, 'agents', f), path.join(agentsDir, f));
+  }
+
+  // Skills (.claude/skills/<name>/SKILL.md + references/ + scripts/)
+  for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
+    const src = path.join(PKG_ROOT, 'skills', skill);
+    if (fs.statSync(src).isDirectory()) copyDir(src, path.join(skillsDir, skill));
+  }
+}
+
+function writeCursor({ selectedMcp, mcpKeys, platforms }) {
+  // Cursor loads .claude/agents/, .claude/skills/, .claude/hooks.json for compatibility.
+  // If Claude Code wasn't selected, seed .claude/ ourselves so Cursor can find them.
+  if (!platforms.includes('Claude Code')) writeClaudeFiles();
+
   const rulesDir = path.join(CWD, '.cursor', 'rules');
-  const cmdsDir  = path.join(CWD, '.cursor', 'commands');
-  mkdir(rulesDir); mkdir(cmdsDir);
+  mkdir(rulesDir);
   for (const name of ['ohc-core','ohc-memory','ohc-discipline']) {
     const src = path.join(PKG_ROOT, 'templates', 'cursor-rules', `${name}.template.mdc`);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(rulesDir, `${name}.mdc`));
   }
   write(path.join(rulesDir, 'ohc-tdd.mdc'),
     `---\ndescription: TDD enforcement for test files\nglobs: ["**/*.test.ts","**/*.test.js","**/*.spec.ts","**/test_*.py"]\n---\n# TDD Rule\nWrite failing test first. Confirm it fails. Then write minimum implementation.\n`);
-  for (const f of fs.readdirSync(path.join(PKG_ROOT, 'commands')))
-    fs.copyFileSync(path.join(PKG_ROOT, 'commands', f), path.join(cmdsDir, f));
+
+  // Cursor-native MCP config: .cursor/mcp.json
+  const mcpServers = {};
+  for (const srv of selectedMcp) {
+    const env = {};
+    const keys = mcpKeys[srv.name];
+    if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
+    const args = [...srv.args];
+    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
+    mcpServers[srv.name] = { command: srv.command, args, env };
+  }
+  write(path.join(CWD, '.cursor', 'mcp.json'), JSON.stringify({ mcpServers }, null, 2));
 }
 
 function writeAntigravity() {
-  const rulesDir     = path.join(CWD, '.agent', 'rules');
-  const skillsDir    = path.join(CWD, '.agent', 'skills');
-  const workflowsDir = path.join(CWD, '.agent', 'workflows');
-  mkdir(rulesDir); mkdir(skillsDir); mkdir(workflowsDir);
-  for (const name of ['ohc-core','ohc-discipline','ohc-memory']) {
-    const src = path.join(PKG_ROOT, 'templates', 'antigravity', `${name}.md`);
-    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(rulesDir, `${name}.md`));
+  // Project scope: .agent/{rules,skills,workflows}
+  // Global scope:  ~/.gemini/antigravity/{rules,skills,workflows}
+  const targets = [
+    { root: path.join(CWD, '.agent') },
+    { root: path.join(os.homedir(), '.gemini', 'antigravity') },
+  ];
+  for (const { root } of targets) {
+    const rulesDir     = path.join(root, 'rules');
+    const skillsDir    = path.join(root, 'skills');
+    const workflowsDir = path.join(root, 'workflows');
+    mkdir(rulesDir); mkdir(skillsDir); mkdir(workflowsDir);
+
+    for (const name of ['ohc-core','ohc-discipline','ohc-memory']) {
+      const src = path.join(PKG_ROOT, 'templates', 'antigravity', `${name}.md`);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(rulesDir, `${name}.md`));
+    }
+    for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
+      const src = path.join(PKG_ROOT, 'skills', skill, 'SKILL.md');
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(skillsDir, `${skill}.md`));
+    }
+    for (const cmd of ['plan','build','review','ship','retro']) {
+      const src = path.join(PKG_ROOT, 'commands', `${cmd}.md`);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(workflowsDir, `${cmd}.md`));
+    }
   }
-  for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
-    const src = path.join(PKG_ROOT, 'skills', skill, 'SKILL.md');
-    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(skillsDir, `${skill}.md`));
-  }
-  for (const cmd of ['plan','build','review','ship','retro']) {
-    const src = path.join(PKG_ROOT, 'commands', `${cmd}.md`);
-    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(workflowsDir, `${cmd}.md`));
-  }
-  // Also ensure global Antigravity dirs exist
-  const global = path.join(os.homedir(), '.gemini', 'antigravity');
-  mkdir(path.join(global, 'skills'));
-  mkdir(path.join(global, 'global_workflows'));
 }
 
 function writeGemini({ project, selectedMcp, mcpKeys }) {
+  // Project-level context file (read by Gemini CLI at project root)
   write(path.join(CWD, 'GEMINI.md'), fill(tmpl('GEMINI.template.md'), { project_name: project.projectName }));
-  
-  const mcpServers = {};
-  for (const srv of selectedMcp) {
-    let env = {};
-    const keys = mcpKeys[srv.name];
-    if (keys) {
-      for (const [k, v] of Object.entries(keys)) env[k] = v;
-    }
-    const args = [...srv.args];
-    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
-      args.push('--api-key', keys.CONTEXT7_API_KEY);
-    }
-    mcpServers[srv.name] = { command: srv.command, args, env };
-  }
-  
-  write(path.join(CWD, 'gemini-extension.json'), JSON.stringify({
-    name: project.projectName,
-    version: "0.3.1",
-    description: `Gemini Code Assist extension for ${project.projectName}`,
-    mcpServers
-  }, null, 2));
-}
 
-function writeOpenCode({ selectedMcp, mcpKeys }) {
-  ['agents', 'commands', 'skills', 'tools'].forEach(d => 
-    mkdir(path.join(CWD, '.opencode', d))
-  );
-  
   const mcpServers = {};
   for (const srv of selectedMcp) {
-    let env = {};
+    const env = {};
     const keys = mcpKeys[srv.name];
-    if (keys) {
-      for (const [k, v] of Object.entries(keys)) env[k] = v;
-    }
+    if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
     const args = [...srv.args];
     if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
       args.push('--api-key', keys.CONTEXT7_API_KEY);
@@ -337,41 +360,55 @@ function writeOpenCode({ selectedMcp, mcpKeys }) {
     mcpServers[srv.name] = { command: srv.command, args, env };
   }
 
-  write(path.join(CWD, 'opencode.json'), JSON.stringify({
-    telemetry: false,
-    theme: 'default',
+  // Install as a user-scope extension: ~/.gemini/extensions/oh-my-colab/gemini-extension.json
+  const extDir = path.join(os.homedir(), '.gemini', 'extensions', 'oh-my-colab');
+  write(path.join(extDir, 'gemini-extension.json'), JSON.stringify({
+    name: 'oh-my-colab',
+    version: require(path.join(PKG_ROOT, 'package.json')).version,
+    description: 'oh-my-colab workflow and MCP servers for Gemini CLI',
+    contextFileName: 'GEMINI.md',
     mcpServers
   }, null, 2));
 }
 
-function writeCodex() {
-  const content = `# oh-my-colab context for Codex CLI
+function writeCodex({ selectedMcp, mcpKeys }) {
+  // Codex CLI reads AGENTS.md at the project root — produced by genAgents().
+  // User-scope prompts dir (custom slash commands) and MCP config live under ~/.codex/.
+  const codexHome    = path.join(os.homedir(), '.codex');
+  const promptsDir   = path.join(codexHome, 'prompts');
+  mkdir(codexHome); mkdir(promptsDir);
 
-You are operating with the oh-my-colab framework — a team-first AI coding workflow system.
+  // Expose OHC commands as Codex prompts (~/.codex/prompts/<name>.md)
+  for (const f of fs.readdirSync(path.join(PKG_ROOT, 'commands'))) {
+    fs.copyFileSync(path.join(PKG_ROOT, 'commands', f), path.join(promptsDir, f));
+  }
 
-## Identity
-Read AGENTS.md for your full system context, agent catalog, and workflow definitions.
-Read .ohc/notepad.md at the start of every session to restore working state.
+  // MCP servers in TOML under [mcp_servers.<name>]
+  const configPath = path.join(codexHome, 'config.toml');
+  let existing = '';
+  try { existing = fs.readFileSync(configPath, 'utf8'); } catch {}
+  const managedStart = '# >>> oh-my-colab managed mcp_servers';
+  const managedEnd   = '# <<< oh-my-colab managed mcp_servers';
+  const stripped = existing.replace(
+    new RegExp(`\\n?${managedStart}[\\s\\S]*?${managedEnd}\\n?`, 'g'), ''
+  ).trimEnd();
 
-## Core Rules
-1. Never write code for tasks >30 minutes without a plan in .ohc/plans/
-2. Always run tests before claiming a task complete
-3. Update .ohc/notepad.md when finishing work (for team handoff)
-4. Follow ohc-coding-discipline: minimal scope, surgical changes, explicit assumptions
-5. Use Context7 for any external library documentation before writing API calls
+  const toTomlString = s => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  const blocks = selectedMcp.map(srv => {
+    const keys = mcpKeys[srv.name] || {};
+    const args = [...srv.args];
+    if (srv.name === 'context7' && keys.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
+    const envEntries = Object.entries(keys).map(([k, v]) => `${k} = ${toTomlString(v)}`).join(', ');
+    return [
+      `[mcp_servers.${srv.name}]`,
+      `command = ${toTomlString(srv.command)}`,
+      `args = [${args.map(toTomlString).join(', ')}]`,
+      envEntries ? `env = { ${envEntries} }` : null,
+    ].filter(Boolean).join('\n');
+  }).join('\n\n');
 
-## Workflows
-- "explore" → explore codebase, populate .ohc/PROJECT.md
-- "plan"    → write plan to .ohc/plans/, confirm before building
-- "build"   → load plan, dispatch subagents, enforce TDD
-- "review"  → two-pass: spec compliance then code quality
-- "ship"    → verify tests, write changelog, clean branch
-- "retro"   → session retrospective, extract learnings
-
-## Bootstrap
-If fresh install: fetch and follow .codex-bootstrap/INSTALL.md
-`;
-  write(path.join(CWD, '.codex'), content);
+  const managed = blocks ? `\n${managedStart}\n${blocks}\n${managedEnd}\n` : '';
+  write(configPath, (stripped ? stripped + '\n' : '') + managed);
 }
 
 function installMcp({ selectedMcp, mcpKeys }) {
@@ -402,19 +439,24 @@ function writeHud({ hudStyle }) {
   const src = path.join(PKG_ROOT, 'scripts', 'hud', 'ohc-hud.sh');
   const dst = path.join(dir, 'ohc-hud.sh');
   if (fs.existsSync(src)) {
-    const map = { 'Full (4 lines)': 'full', 'Standard (2 lines)': 'standard', 'Minimal (1 line)': 'minimal' };
+    const map = { 'Full (3 lines)': 'full', 'Standard (2 lines)': 'standard', 'Minimal (1 line)': 'minimal' };
     let c = fs.readFileSync(src, 'utf8');
     c = c.replace(/^OHC_HUD_STYLE=.*/m, `OHC_HUD_STYLE="${map[hudStyle] || 'full'}"`);
     write(dst, c, { mode: 0o755 });
   }
 }
 
-function writeConfig({ platforms, teamMode, workflow, notifications, hudStyle }) {
+function writeConfig({ platforms, teamMode, workflow, hudStyle }) {
+  const { version } = require(path.join(PKG_ROOT, 'package.json'));
   write(path.join(os.homedir(), '.ohc', 'config.json'), JSON.stringify({
-    version: '0.3.1', platforms, teamMode,
-    defaultWorkflow: workflow, notifications, hudStyle,
+    version, platforms, teamMode,
+    defaultWorkflow: workflow, hudStyle,
     installedAt: new Date().toISOString()
   }, null, 2));
 }
 
-run().catch(e => { process.stderr.write(`Setup error: ${e.message}\n`); process.exit(1); });
+module.exports = run;
+
+if (require.main === module) {
+  run().catch(e => { process.stderr.write(`Setup error: ${e.message}\n`); process.exit(1); });
+}

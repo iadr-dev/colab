@@ -1,7 +1,7 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.3.1",
-  "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory across Claude Code, Cursor, Codex, Gemini, OpenCode, and Antigravity.",
+  "version": "0.4.0",
+  "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory across Claude Code, Cursor, Codex, Gemini, and Antigravity.",
   "keywords": [
     "claude-code",
     "cursor",
@@ -11,8 +11,7 @@
     "ai-coding",
     "workflows",
     "tdd",
-    "agents",
-    "opencode"
+    "agents"
   ],
   "license": "MIT",
   "bin": {
@@ -24,6 +23,7 @@
   "scripts": {
     "test": "bash tests/smoke/test-all.sh",
     "lint:skills": "node tests/smoke/check-skill-lines.js",
+    "prepublishOnly": "npm test && npm run lint:skills",
     "version:check": "node scripts/version.js check",
     "version:fix": "node scripts/version.js fix",
     "version:set": "node scripts/version.js set",
