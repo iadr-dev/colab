@@ -2,26 +2,22 @@
 /**
  * on-stop.js — Claude Code stop hook
  * Fires: when agent finishes a response
- * Does:  save session summary, send notifications, suggest retro after 30min
+ * Does:  save session summary, suggest retro after 30min
  */
 
 const fs   = require('fs');
 const path = require('path');
-const os   = require('os');
-const https = require('https');
 const readline = require('readline');
 
-const CWD    = process.cwd();
-const OHC    = path.join(CWD, '.ohc');
-const CONFIG = path.join(os.homedir(), '.ohc', 'config.json');
+const CWD = process.cwd();
+const OHC = path.join(CWD, '.ohc');
 
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
-function cfg() { try { return JSON.parse(read(CONFIG) || '{}'); } catch { return {}; } }
 
 let raw = '';
 const rl = readline.createInterface({ input: process.stdin });
 rl.on('line', l => raw += l);
-rl.on('close', async () => {
+rl.on('close', () => {
   let event = {};
   try { event = JSON.parse(raw); } catch {}
 
@@ -58,39 +54,29 @@ ${lastText.slice(0, 300)}${lastText.length > 300 ? '...' : ''}
 `;
   try { fs.writeFileSync(path.join(sessionDir, 'summary.md'), summary); } catch {}
 
-  // Retro prompt
-  const retroReminder = durationMin >= 30
+  // Retro prompt — only suggest once per session (guard with retro_done flag)
+  const retroReminder = (durationMin >= 30 && !meta.retro_done)
     ? `\n\n<system_reminder retro_prompt="true">
-Session ran ${durationMin} minutes. Run /retro to capture learnings and update memory files.
+Session has run ${durationMin} minutes. Run /retro to capture learnings and update memory files.
+(This reminder will not repeat once /retro has run.)
 </system_reminder>`
     : '';
 
-  // Notify
-  const config = cfg();
-  if (config.notifications?.provider && config.notifications.provider !== 'none') {
-    try {
-      await notify(config.notifications, `oh-my-colab (${durationMin}min): ${lastText.slice(0, 200)}`);
-    } catch {}
-  }
+  // Ralph continuation — if ralph is active, inject next-iteration prompt
+  let ralphReminder = '';
+  try {
+    const ralph = require('../scripts/ralph');
+    const summary = ralph.statusSummary();
+    if (summary) {
+      ralphReminder = `\n\n<system_reminder ralph_continuation="true">
+${summary}
+Ralph is still active. Continue iteration on the current story when the next session starts.
+</system_reminder>`;
+    }
+  } catch {}
 
   process.stdout.write(JSON.stringify({
     action: 'continue',
-    ...(retroReminder ? { system_reminder: retroReminder } : {})
+    ...(retroReminder || ralphReminder ? { system_reminder: retroReminder + ralphReminder } : {})
   }));
 });
-
-async function notify({ provider, webhookUrl }, message) {
-  const url  = new URL(webhookUrl || '');
-  const body = JSON.stringify(provider === 'discord'
-    ? { embeds: [{ title: '🧠 oh-my-colab', description: message, color: 0x7c3aed }] }
-    : { text: message }
-  );
-  return new Promise(res => {
-    const req = https.request({
-      hostname: url.hostname, path: url.pathname + url.search, method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
-    }, r => { r.resume(); res(); });
-    req.on('error', res);
-    req.write(body); req.end();
-  });
-}

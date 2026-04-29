@@ -38,11 +38,43 @@ const project  = read(path.join(OHC, 'PROJECT.md'));
 const notepad  = read(path.join(OHC, 'notepad.md'));
 const workflow = read(path.join(OHC, 'state', 'current-workflow.json'));
 
+// Load recent learnings from cross-session JSONL
+let recentLearnings = null;
+try {
+  const memory = require('../scripts/memory');
+  const learnings = memory.readRecentLearnings(5);
+  if (learnings.length > 0) {
+    recentLearnings = learnings.map((l, i) =>
+      `${i + 1}. [${l.ts?.slice(0, 10) || '?'}] ${l.notes || l.what_worked || JSON.stringify(l)}`
+    ).join('\n');
+  }
+} catch {}
+
+// Load research cache index (anti-goldfish for external docs)
+let researchIndex = null;
+try {
+  const research = require('../scripts/research');
+  researchIndex = research.indexForSessionStart(20) || null;
+} catch {}
+
 const parts = [];
 if (soul)    parts.push(`<ohc_soul>\n${soul}\n</ohc_soul>`);
 if (user)    parts.push(`<ohc_user>\n${user}\n</ohc_user>`);
 if (project) parts.push(`<ohc_project>\n${project}\n</ohc_project>`);
 if (notepad) parts.push(`<ohc_session_state>\n${notepad}\n</ohc_session_state>`);
+
+if (recentLearnings) {
+  parts.push(`<ohc_recent_learnings>
+Last 5 cross-session learnings (anti-goldfish-brain):
+${recentLearnings}
+</ohc_recent_learnings>`);
+}
+
+if (researchIndex) {
+  parts.push(`<ohc_research_index>
+${researchIndex}
+</ohc_research_index>`);
+}
 
 if (workflow) {
   try {
