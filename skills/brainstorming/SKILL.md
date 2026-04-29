@@ -20,6 +20,10 @@ Ask questions that reveal hidden requirements or constraints:
 - "Is there an existing pattern in the codebase we should follow?"
 - "Who is the user and what do they actually need?"
 
+If the user uses project-specific terms, check `.ohc/PROJECT.md` first. Also
+read optional domain docs (`CONTEXT.md` / `CONTEXT-MAP.md`) when present.
+Sharpen overloaded terms before designing.
+
 Stop when you understand the problem well enough to design for it.
 
 ## Phase 2: Idea Expansion
@@ -48,3 +52,4 @@ Present to user. Get explicit confirmation before moving to writing-plans.
 "Does this match what you were thinking? Any constraints I'm missing?"
 
 See references/brainstorm-formats.md for alternative formats.
+See references/domain-docs.md for glossary and ADR-aware brainstorming.

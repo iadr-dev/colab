@@ -14,6 +14,10 @@ Run after significant sessions. Takes 5-10 minutes. Pays off every future sessio
 
 ## Step 1: Session Diff
 ```bash
+# Node (preferred — zero Python dependency):
+node skills/retrospective/scripts/extract-patterns.js
+
+# Python fallback (if Node 18+ unavailable):
 python3 skills/retrospective/scripts/extract-patterns.py
 ```
 Answer:

@@ -120,3 +120,13 @@ When finishing any work session:
 Before starting: read PROJECT.md conventions section.
 After finishing: run `bash skills/ohc-coding-discipline/scripts/scope-check.sh`
 Confirm output shows only files in the task scope.
+
+---
+
+## OHC Extension 4: Architecture Language
+
+When reviewing or refactoring structure, use precise architecture vocabulary:
+module, interface, seam, adapter, depth, leverage, and locality.
+Prefer deep modules: small interfaces that hide meaningful behavior.
+
+See references/architecture-vocabulary.md before proposing structural changes.
