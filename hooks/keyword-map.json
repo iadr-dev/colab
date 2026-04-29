@@ -21,6 +21,11 @@
   "ralph":            { "workflow": "BUILD",                      "mode": "persistence", "stopOnBlocked": 3 },
   "keep going":       { "workflow": "BUILD",                      "mode": "persistence", "stopOnBlocked": 3 },
 
+  "stop ralph":       { "skill": "ralph",                        "mode": "persistent", "action": "deactivate" },
+  "ralph stop":       { "skill": "ralph",                        "mode": "persistent", "action": "deactivate" },
+  "ralph mode":       { "skill": "ralph",                        "mode": "persistent", "action": "activate" },
+  "/ralph":           { "skill": "ralph",                        "mode": "persistent", "action": "activate" },
+
   "review":           { "skill": "requesting-code-review",        "mode": "single" },
   "code review":      { "skill": "requesting-code-review",        "mode": "single" },
   "check this":       { "skill": "requesting-code-review",        "mode": "single" },
@@ -46,6 +51,12 @@
 
   "discipline":       { "skill": "ohc-coding-discipline",         "mode": "enforce" },
   "scope check":      { "script": "skills/ohc-coding-discipline/scripts/scope-check.sh" },
+
+  "stop caveman":     { "skill": "caveman",                       "mode": "persistent", "action": "deactivate" },
+  "stop compressed mode": { "skill": "caveman",                   "mode": "persistent", "action": "deactivate" },
+  "normal mode":      { "skill": "caveman",                       "mode": "persistent", "action": "deactivate" },
+  "caveman mode":     { "skill": "caveman",                       "mode": "persistent", "action": "activate" },
+  "compressed mode":  { "skill": "caveman",                       "mode": "persistent", "action": "activate" },
 
   "_custom": {
     "_comment": "Add your team's custom triggers here. Same format as above.",

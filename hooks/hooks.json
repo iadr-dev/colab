@@ -1,0 +1,55 @@
+{
+  "_comment": "Anthropic verbose-format hook manifest. Deployed by setup/index.js to .claude/hooks/. This is the single source of hook registration — plugin.json no longer carries inline hook entries.",
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "command": "node .claude/hooks/on-session-start.js"
+    },
+    {
+      "event": "UserPromptSubmit",
+      "command": "node .claude/hooks/on-user-prompt.js"
+    },
+    {
+      "event": "PreToolUse",
+      "command": "node .claude/hooks/on-pre-tool.js"
+    },
+    {
+      "event": "PostToolUse",
+      "command": "node .claude/hooks/on-post-tool.js"
+    },
+    {
+      "event": "PostToolUse",
+      "matcher": { "tool_name": "Bash", "exit_code_is_not": 0 },
+      "command": "node .claude/hooks/on-post-tool-failure.js"
+    },
+    {
+      "event": "SubagentStart",
+      "command": "node .claude/hooks/on-subagent-start.js"
+    },
+    {
+      "event": "SubagentStop",
+      "command": "node .claude/hooks/on-subagent-stop.js"
+    },
+    {
+      "event": "PreCompact",
+      "command": "node .claude/hooks/on-pre-compact.js"
+    },
+    {
+      "event": "PostCompact",
+      "command": "node .claude/hooks/on-post-compact.js"
+    },
+    {
+      "event": "Stop",
+      "command": "node .claude/hooks/on-stop.js"
+    },
+    {
+      "event": "SessionEnd",
+      "command": "node .claude/hooks/on-session-end.js"
+    },
+    {
+      "event": "PermissionRequest",
+      "matcher": { "tool_name": "Bash" },
+      "command": "node .claude/hooks/on-permission-request.js"
+    }
+  ]
+}
