@@ -11,7 +11,7 @@
     {
       "name": "oh-my-colab",
       "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
-      "version": "0.4.4",
+      "version": "0.4.5",
       "author": {
         "name": "iadr-dev",
         "url": "https://github.com/iadr-dev"
@@ -22,5 +22,5 @@
       "tags": ["workflow", "tdd", "teams", "multi-platform", "memory", "agents", "mcp"]
     }
   ],
-  "version": "0.4.4"
+  "version": "0.4.5"
 }
