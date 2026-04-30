@@ -10,6 +10,14 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.2] — 2026-04-30
+
+### Changed
+
+- Claude marketplace manifest (`marketplace.json`): display name `oh-my-colab`, local `./` plugin source, consolidated version fields for marketplace tooling
+
+---
+
 ## [0.4.1] — 2026-04-29
 
 ### Changed
@@ -189,7 +197,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/iadr-dev/colab/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/iadr-dev/colab/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/iadr-dev/colab/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/iadr-dev/colab/compare/v0.3.0...v0.3.1
