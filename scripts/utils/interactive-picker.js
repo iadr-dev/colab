@@ -45,10 +45,15 @@ function picker({ title, subtitle, options, multiSelect = false, defaults = [] }
       stdout.write(`╚${bar}╝\n`);
     }
 
-    function done() { stdin.setRawMode(false); stdin.pause(); stdout.write('\x1B[?25h'); }
+    function done() {
+      stdin.removeListener('keypress', onKeypress);
+      stdin.setRawMode(false);
+      stdin.pause();
+      stdout.write('\x1B[?25h');
+    }
 
     render();
-    stdin.on('keypress', (ch, key) => {
+    function onKeypress(ch, key) {
       if (!key) return;
       if (key.name === 'up')   { cursor = (cursor - 1 + options.length) % options.length; render(); }
       if (key.name === 'down') { cursor = (cursor + 1) % options.length; render(); }
@@ -62,7 +67,8 @@ function picker({ title, subtitle, options, multiSelect = false, defaults = [] }
         resolve(multiSelect ? (selected.size ? [...selected] : null) : [options[cursor]]);
       }
       if (key.ctrl && key.name === 'c') { done(); resolve(null); }
-    });
+    }
+    stdin.on('keypress', onKeypress);
   });
 }
 
