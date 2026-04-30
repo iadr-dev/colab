@@ -23,7 +23,7 @@ Setup writes:
 - CLAUDE.md + AGENTS.md (project root)
 - .claude/ agents/ + skills/ + commands/ + hooks/ + hooks.json (Claude Code; also used by Cursor for compat)
 - .cursor/rules/*.mdc + .cursor/mcp.json (if Cursor)
-- .agent/{rules,skills,workflows}/ + ~/.gemini/antigravity/{rules,skills,workflows}/ (if Antigravity)
+- .agents/{rules,skills,workflows}/ (if Antigravity) + global mcp_config.json
 - GEMINI.md + ~/.gemini/extensions/oh-my-colab/gemini-extension.json (if Gemini)
 - ~/.codex/prompts/ + ~/.codex/config.toml (if Codex)
 - MCP servers via `claude mcp add --scope user` (if Claude Code)

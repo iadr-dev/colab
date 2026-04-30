@@ -14,8 +14,13 @@ function maskedInput(prompt, label) {
     stdin.resume();
     stdin.setEncoding('utf8');
     readline.emitKeypressEvents(stdin);
-    function done() { stdin.setRawMode(false); stdin.pause(); stdout.write('\n'); }
-    stdin.on('keypress', (ch, key) => {
+    function done() {
+      stdin.removeListener('keypress', onKeypress);
+      stdin.setRawMode(false);
+      stdin.pause();
+      stdout.write('\n');
+    }
+    function onKeypress(ch, key) {
       if (!key) return;
       if (key.ctrl && key.name === 'c') { done(); resolve({ value: '', skipped: true }); return; }
       if (key.name === 'return') { done(); resolve({ value, skipped: false }); return; }
@@ -30,7 +35,8 @@ function maskedInput(prompt, label) {
         stdout.clearLine(0); stdout.cursorTo(2);
         stdout.write('> ' + '*'.repeat(value.length - 1) + ch);
       }
-    });
+    }
+    stdin.on('keypress', onKeypress);
   });
 }
 

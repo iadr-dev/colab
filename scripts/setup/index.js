@@ -21,9 +21,9 @@ const MCP_SERVERS = [
   { name: 'brave-search', label: 'Brave Search  — web search',                              needsKey: true,       keyName: 'BRAVE_API_KEY',                     command: 'npx', args: ['-y', '@modelcontextprotocol/server-brave-search'] },
   { name: 'playwright',   label: 'Playwright    — browser automation, e2e testing',         needsKey: false,      command: 'npx', args: ['-y', '@playwright/mcp'] },
   { name: 'firecrawl',    label: 'Firecrawl     — web scraping',                            needsKey: true,       keyName: 'FIRECRAWL_API_KEY',                 command: 'npx', args: ['-y', 'firecrawl-mcp'] },
-  { name: 'linear',       label: 'Linear        — project management',                      needsKey: true,       keyName: 'LINEAR_API_KEY',                    command: 'npx', args: ['-y', '@tacticlaunch/mcp-linear'] },
-  { name: 'sentry',       label: 'Sentry        — error monitoring',                        needsKey: true,       keyName: 'SENTRY_AUTH_TOKEN',                 command: 'npx', args: ['-y', '@sentry/mcp-server'] },
-  { name: 'figma',        label: 'Figma         — design context',                          needsKey: true,       keyName: 'FIGMA_API_KEY',                     command: 'npx', args: ['-y', 'figma-developer-mcp'] },
+  { name: 'linear',       label: 'Linear        — project management',                      needsKey: false,      command: 'npx', args: ['-y', 'mcp-remote', 'https://mcp.linear.app/mcp'] },
+  { name: 'sentry',       label: 'Sentry        — error monitoring',                        needsKey: false,      url: 'https://mcp.sentry.dev/mcp' },
+  { name: 'figma',        label: 'Figma         — design context',                          needsKey: false,      url: 'https://mcp.figma.com/mcp' },
 ];
 
 async function run() {
@@ -113,10 +113,10 @@ async function run() {
     (platforms.includes('Claude Code') || platforms.includes('Codex CLI') || platforms.includes('Cursor'))
                                        ? ['AGENTS.md / CLAUDE.md',          () => genAgents(config)] : null,
     platforms.includes('Claude Code')  ? ['~/.claude/settings.json',        () => genSettings(config)] : null,
-    platforms.includes('Claude Code')  ? ['.claude/ hooks+commands+agents+skills', () => writeClaudeFiles()] : null,
+    platforms.includes('Claude Code')  ? ['.claude/ hooks+commands+agents+skills+scripts', () => writeClaudeFiles()] : null,
     platforms.includes('Cursor')       ? ['.cursor/rules+mcp (+ .claude/ compat)', () => writeCursor(config)] : null,
-    platforms.includes('Antigravity')  ? ['.agent/ + ~/.gemini/antigravity/', () => writeAntigravity()] : null,
-    platforms.includes('Gemini CLI')   ? ['GEMINI.md + ~/.gemini/extensions/oh-my-colab/', () => writeGemini(config)] : null,
+    platforms.includes('Antigravity')  ? ['.agents/ + scripts + global mcp_config.json', () => writeAntigravity(config)] : null,
+    platforms.includes('Gemini CLI')   ? ['GEMINI.md + ~/.gemini/settings.json', () => writeGemini(config)] : null,
     platforms.includes('Codex CLI')    ? ['~/.codex/ prompts + config.toml', () => writeCodex(config)] : null,
     platforms.includes('Claude Code')  ? ['MCP servers via claude mcp add', () => installMcp(config)] : null,
     hudStyle !== 'None'                ? ['HUD status bar',            () => writeHud(config)] : null,
@@ -128,8 +128,19 @@ async function run() {
     catch (e) { stdout.write(`  ✗ ${label} — ${e.message}\n`); }
   }
 
-  stdout.write('\n  ✅ oh-my-colab installed!\n\n');
-  stdout.write('  Next steps:\n');
+  console.log('\n  ✅ oh-my-colab installed!\n');
+
+  if (platforms.includes('Cursor')) {
+    const cursorNative = selectedMcp.filter(s => ['context7', 'figma', 'sentry'].includes(s.name));
+    if (cursorNative.length > 0) {
+      console.log('  💡 Cursor Tip:');
+      console.log(`     You selected ${cursorNative.map(s => s.name).join(', ')}.`);
+      console.log('     Please install these via: https://cursor.com/dashboard/plugins');
+      console.log('     They are excluded from .cursor/mcp.json for stability.\n');
+    }
+  }
+
+  console.log('  Next steps:');
   stdout.write('    1. Run /explore to understand this codebase\n');
   stdout.write('    2. Run /plan to start building something\n');
   stdout.write('    3. Type "autopilot" to let oh-my-colab drive\n\n');
@@ -193,7 +204,7 @@ function genProject({ project }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.4.0', project_name: project.projectName,
+    version: '0.4.1', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -287,6 +298,10 @@ function writeClaudeFiles() {
     const src = path.join(PKG_ROOT, 'skills', skill);
     if (fs.statSync(src).isDirectory()) copyDir(src, path.join(skillsDir, skill));
   }
+
+  // Scripts (.claude/scripts/ for runtime support)
+  const scriptsSrc = path.join(PKG_ROOT, 'scripts');
+  if (fs.existsSync(scriptsSrc)) copyDir(scriptsSrc, path.join(CWD, '.claude', 'scripts'));
 }
 
 function writeCursor({ selectedMcp, mcpKeys, platforms }) {
@@ -305,43 +320,103 @@ function writeCursor({ selectedMcp, mcpKeys, platforms }) {
 
   // Cursor-native MCP config: .cursor/mcp.json
   const mcpServers = {};
+  const cursorExcludes = ['context7', 'figma', 'sentry'];
+  for (const srv of selectedMcp) {
+    if (cursorExcludes.includes(srv.name)) continue;
+    const env = {};
+    const keys = mcpKeys[srv.name];
+    if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
+    if (srv.url) {
+      mcpServers[srv.name] = { url: srv.url, env };
+    } else {
+      const args = [...srv.args];
+      if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
+      mcpServers[srv.name] = { command: srv.command, args, env };
+    }
+  }
+
+  const mcpPath = path.join(CWD, '.cursor', 'mcp.json');
+  let existing = {};
+  try { existing = JSON.parse(fs.readFileSync(mcpPath, 'utf8')); } catch {}
+  write(mcpPath, JSON.stringify({
+    ...existing,
+    mcpServers: {
+      ...(existing.mcpServers || {}),
+      ...mcpServers
+    }
+  }, null, 2));
+}
+
+function writeAntigravity({ selectedMcp, mcpKeys }) {
+  // Project scope: .agents/{rules,skills,workflows}
+  const root = path.join(CWD, '.agents');
+  const rulesDir     = path.join(root, 'rules');
+  const skillsDir    = path.join(root, 'skills');
+  const workflowsDir = path.join(root, 'workflows');
+  mkdir(rulesDir); mkdir(skillsDir); mkdir(workflowsDir);
+
+  for (const name of ['ohc-core','ohc-discipline','ohc-memory']) {
+    const src = path.join(PKG_ROOT, 'templates', 'antigravity', `${name}.md`);
+    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(rulesDir, `${name}.md`));
+  }
+  for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
+    const src = path.join(PKG_ROOT, 'skills', skill);
+    if (fs.statSync(src).isDirectory()) copyDir(src, path.join(skillsDir, skill));
+  }
+
+  // Scripts (.agents/scripts/ for runtime support)
+  const scriptsSrc = path.join(PKG_ROOT, 'scripts');
+  if (fs.existsSync(scriptsSrc)) copyDir(scriptsSrc, path.join(root, 'scripts'));
+
+  const commandsDir = path.join(PKG_ROOT, 'commands');
+  for (const f of fs.readdirSync(commandsDir)) {
+    if (f === 'setup.md') continue;
+    const src = path.join(commandsDir, f);
+    const name = path.basename(f, '.md');
+    if (fs.existsSync(src)) {
+      let content = fs.readFileSync(src, 'utf8');
+      if (!content.includes('trigger:')) {
+        content = content.replace(/^---/, `---\ntrigger: /${name}`);
+      }
+      // Clean up description: remove "<NAME> workflow:" prefix, replace arrows, shorten if needed
+      content = content.replace(/^description:\s*(.*)/m, (_, d) => {
+        let clean = d
+          .replace(/^[A-Z]+\s+workflow:\s*/i, '')
+          .replace(/→/g, '->')
+          .replace(/[\[\]]/g, '')
+          .trim();
+        if (clean.length > 100) clean = clean.substring(0, 97) + '...';
+        return `description: ${clean}`;
+      });
+      write(path.join(workflowsDir, f), content);
+    }
+  }
+
+  // Global scope: ~/.gemini/antigravity/mcp_config.json
+  const mcpServers = {};
   for (const srv of selectedMcp) {
     const env = {};
     const keys = mcpKeys[srv.name];
     if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
-    const args = [...srv.args];
-    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
-    mcpServers[srv.name] = { command: srv.command, args, env };
-  }
-  write(path.join(CWD, '.cursor', 'mcp.json'), JSON.stringify({ mcpServers }, null, 2));
-}
-
-function writeAntigravity() {
-  // Project scope: .agent/{rules,skills,workflows}
-  // Global scope:  ~/.gemini/antigravity/{rules,skills,workflows}
-  const targets = [
-    { root: path.join(CWD, '.agent') },
-    { root: path.join(os.homedir(), '.gemini', 'antigravity') },
-  ];
-  for (const { root } of targets) {
-    const rulesDir     = path.join(root, 'rules');
-    const skillsDir    = path.join(root, 'skills');
-    const workflowsDir = path.join(root, 'workflows');
-    mkdir(rulesDir); mkdir(skillsDir); mkdir(workflowsDir);
-
-    for (const name of ['ohc-core','ohc-discipline','ohc-memory']) {
-      const src = path.join(PKG_ROOT, 'templates', 'antigravity', `${name}.md`);
-      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(rulesDir, `${name}.md`));
-    }
-    for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
-      const src = path.join(PKG_ROOT, 'skills', skill, 'SKILL.md');
-      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(skillsDir, `${skill}.md`));
-    }
-    for (const cmd of ['plan','build','review','ship','retro']) {
-      const src = path.join(PKG_ROOT, 'commands', `${cmd}.md`);
-      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(workflowsDir, `${cmd}.md`));
+    if (srv.url) {
+      mcpServers[srv.name] = { url: srv.url, env };
+    } else {
+      const args = [...srv.args];
+      if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
+      mcpServers[srv.name] = { command: srv.command, args, env };
     }
   }
+
+  const mcpPath = path.join(os.homedir(), '.gemini', 'antigravity', 'mcp_config.json');
+  let existing = {};
+  try { existing = JSON.parse(fs.readFileSync(mcpPath, 'utf8')); } catch {}
+  write(mcpPath, JSON.stringify({
+    ...existing,
+    mcpServers: {
+      ...(existing.mcpServers || {}),
+      ...mcpServers
+    }
+  }, null, 2));
 }
 
 function writeGemini({ project, selectedMcp, mcpKeys }) {
@@ -353,21 +428,27 @@ function writeGemini({ project, selectedMcp, mcpKeys }) {
     const env = {};
     const keys = mcpKeys[srv.name];
     if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
-    const args = [...srv.args];
-    if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
-      args.push('--api-key', keys.CONTEXT7_API_KEY);
+    if (srv.url) {
+      mcpServers[srv.name] = { url: srv.url, env };
+    } else {
+      const args = [...srv.args];
+      if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
+        args.push('--api-key', keys.CONTEXT7_API_KEY);
+      }
+      mcpServers[srv.name] = { command: srv.command, args, env };
     }
-    mcpServers[srv.name] = { command: srv.command, args, env };
   }
 
-  // Install as a user-scope extension: ~/.gemini/extensions/oh-my-colab/gemini-extension.json
-  const extDir = path.join(os.homedir(), '.gemini', 'extensions', 'oh-my-colab');
-  write(path.join(extDir, 'gemini-extension.json'), JSON.stringify({
-    name: 'oh-my-colab',
-    version: require(path.join(PKG_ROOT, 'package.json')).version,
-    description: 'oh-my-colab workflow and MCP servers for Gemini CLI',
-    contextFileName: 'GEMINI.md',
-    mcpServers
+  // Write to ~/.gemini/settings.json for Gemini MCP support
+  const settingsPath = path.join(os.homedir(), '.gemini', 'settings.json');
+  let existingSettings = {};
+  try { existingSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf8')); } catch {}
+  write(settingsPath, JSON.stringify({
+    ...existingSettings,
+    mcpServers: {
+      ...(existingSettings.mcpServers || {}),
+      ...mcpServers
+    }
   }, null, 2));
 }
 
@@ -396,9 +477,12 @@ function writeCodex({ selectedMcp, mcpKeys }) {
   const toTomlString = s => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
   const blocks = selectedMcp.map(srv => {
     const keys = mcpKeys[srv.name] || {};
+    const envEntries = Object.entries(keys).map(([k, v]) => `${k} = ${toTomlString(v)}`).join(', ');
+    if (srv.url) {
+      return [`[mcp_servers.${srv.name}]`, `url = ${toTomlString(srv.url)}`, envEntries ? `env = { ${envEntries} }` : null].filter(Boolean).join('\n');
+    }
     const args = [...srv.args];
     if (srv.name === 'context7' && keys.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
-    const envEntries = Object.entries(keys).map(([k, v]) => `${k} = ${toTomlString(v)}`).join(', ');
     return [
       `[mcp_servers.${srv.name}]`,
       `command = ${toTomlString(srv.command)}`,
@@ -420,7 +504,9 @@ function installMcp({ selectedMcp, mcpKeys }) {
         for (const [k, v] of Object.entries(keys)) cmd += ` -e ${k}=${v}`;
       }
       // Context7 with optional key
-      if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
+      if (srv.url) {
+        cmd += ` ${srv.url}`;
+      } else if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) {
         cmd += ` -- ${srv.command} ${srv.args.join(' ')} --api-key ${keys.CONTEXT7_API_KEY}`;
       } else {
         cmd += ` -- ${srv.command} ${srv.args.join(' ')}`;
