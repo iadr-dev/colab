@@ -1,7 +1,20 @@
 {
-  "name": "@iadr-dev/colab",
-  "version": "0.4.3",
+  "name": "oh-my-colab",
+  "version": "0.4.4",
   "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
+  "author": {
+    "name": "iadr-dev",
+    "url": "https://github.com/iadr-dev"
+  },
+  "homepage": "https://github.com/iadr-dev/colab",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "workflow",
+    "multi-agent",
+    "teams",
+    "memory"
+  ],
   "entrypoint": "CLAUDE.md",
   "commands": [
     "setup",
