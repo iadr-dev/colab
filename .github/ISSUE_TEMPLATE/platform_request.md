@@ -12,7 +12,7 @@ assignees: ''
 <!-- How does it read system context? File? API? -->
 
 ## Skill/rule equivalent
-<!-- .mdc rules, .agent/rules/, plugin system? -->
+<!-- .mdc rules, .agents/rules/, plugin system? -->
 
 ## Command equivalent
 <!-- Slash commands? How defined? -->

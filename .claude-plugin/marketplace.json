@@ -1,9 +1,28 @@
 {
-  "author": "iadr-dev",
-  "displayName": "oh-my-colab",
-  "tagline": "Team-first AI coding workflows with persistent memory",
-  "tags": ["workflow","tdd","teams","multi-platform","memory","agents","mcp"],
-  "installCommand": "/plugin install @iadr-dev/colab",
-  "homepage": "https://github.com/iadr-dev/colab",
-  "icon": "🧠"
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "iadr-dev/colab",
+  "description": "oh-my-colab — Team-first AI coding workflows with persistent memory",
+  "owner": {
+    "name": "iadr-dev",
+    "email": "iadr.dev@gmail.com",
+    "url": "https://github.com/iadr-dev"
+  },
+  "plugins": [
+    {
+      "name": "@iadr-dev/colab",
+      "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
+      "author": {
+        "name": "iadr-dev",
+        "url": "https://github.com/iadr-dev"
+      },
+      "category": "workflow",
+      "source": {
+        "source": "github",
+        "repo": "iadr-dev/colab"
+      },
+      "homepage": "https://github.com/iadr-dev/colab",
+      "version": "0.4.0",
+      "tags": ["workflow", "tdd", "teams", "multi-platform", "memory", "agents", "mcp"]
+    }
+  ]
 }
