@@ -8,6 +8,12 @@
   },
   "homepage": "https://github.com/iadr-dev/colab",
   "license": "MIT",
-  "keywords": ["claude-code", "workflow", "multi-agent", "teams", "memory"],
+  "keywords": [
+    "claude-code",
+    "workflow",
+    "multi-agent",
+    "teams",
+    "memory"
+  ],
   "skills": "./skills/"
 }

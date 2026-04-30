@@ -10,6 +10,19 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.5] — 2026-04-30
+
+### Added
+
+- Workflow-aligned skills (`explore`, `plan`, `build`, `review`, `ship`, `retro`, `autopilot`, `team`, `research`, `setup`, `skill`) packaged beside existing methodology skills for Claude slash-command routing
+
+### Changed
+
+- Claude plugin manifest loads bundled workflow definitions via **`skills`** path instead of inline command lists
+- Marketplace and package semver aligned to **0.4.5**
+
+---
+
 ## [0.4.4] — 2026-04-30
 
 ### Changed
@@ -213,7 +226,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/iadr-dev/colab/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/iadr-dev/colab/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/iadr-dev/colab/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/iadr-dev/colab/compare/v0.4.1...v0.4.2
