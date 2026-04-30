@@ -8,9 +8,20 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+---
+
+## [0.4.1] — 2026-04-29
+
 ### Changed
 
-- Cursor and Antigravity templates — routing hints for `/team` and `/research`, research-cache-first Context7 usage, and memory docs for shared `.ohc/research/` plus parallel-worker RESULT.json artifacts
+- README — Claude plugin marketplace URL, Antigravity `.agents/` wording in setup overview, skill table formatting
+- Claude plugin marketplace metadata (`marketplace.json`)
+- `ohc setup` — Antigravity-related install paths and wizard flow refinements
+- Interactive setup helpers (`interactive-picker`, `masked-input`)
+
+### Fixed
+
+- Platform request issue template label consistency
 
 ---
 
@@ -116,7 +127,7 @@ Versioning: [Semantic Versioning](https://semver.org/)
 **Platform support (6 platforms)**
 - Claude Code — `.claude-plugin/` manifest, CLAUDE.md, hooks, commands
 - Cursor — `.cursor/rules/*.mdc`, `.cursor/commands/`, self-learning integration
-- Antigravity — `.agent/rules/`, `.agent/skills/`, `.agent/workflows/`
+- Antigravity — `.agents/rules/`, `.agents/skills/`, `.agents/workflows/`
 - Codex CLI — `.codex` context file, AGENTS.md symlink, bootstrap INSTALL.md
 - Gemini CLI — `GEMINI.md`, `gemini-extension.json`
 - OpenCode — `.opencode/plugins/colab.js`
@@ -178,7 +189,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/iadr-dev/colab/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/iadr-dev/colab/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/iadr-dev/colab/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/iadr-dev/colab/compare/v0.2.1...v0.3.0
