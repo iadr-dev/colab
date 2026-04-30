@@ -14,15 +14,15 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 
 ## Why oh-my-colab?
 
-| Problem                                              | Solution                                                               |
-| ---------------------------------------------------- | ---------------------------------------------------------------------- |
-| Goldfish brain — forgets everything between sessions | 4-layer memory: SOUL + USER + PROJECT + notepad                        |
-| Re-fetches the same library docs every session       | Cross-session research cache (`.ohc/research/`) — lookup before fetch  |
-| Jumps to code without planning                       | Enforced PLAN gate for tasks >30 minutes                               |
-| "Done" without running tests                         | Verifier agent reads actual output — 0 failing, 0 skipped              |
-| Only works with one platform                         | 5 platforms: Claude Code, Cursor, Antigravity, Codex, Gemini           |
+| Problem                                               | Solution                                                              |
+| ----------------------------------------------------- | --------------------------------------------------------------------- |
+| Goldfish brain — forgets everything between sessions  | 4-layer memory: SOUL + USER + PROJECT + notepad                       |
+| Re-fetches the same library docs every session        | Cross-session research cache (`.ohc/research/`) — lookup before fetch |
+| Jumps to code without planning                        | Enforced PLAN gate for tasks >30 minutes                              |
+| "Done" without running tests                          | Verifier agent reads actual output — 0 failing, 0 skipped             |
+| Only works with one platform                          | 5 platforms: Claude Code, Cursor, Antigravity, Codex, Gemini          |
 | Parallel agents can't coordinate or verify each other | `/team` five-stage pipeline with `RESULT.json` gate + auto fix loop   |
-| No learning loop                                     | RETRO extracts skills from every session                               |
+| No learning loop                                      | RETRO extracts skills from every session                              |
 
 ---
 
@@ -31,7 +31,7 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 ### Claude Code (plugin)
 
 ```
-/plugin marketplace add iadr-dev/colab
+/plugin marketplace add https://github.com/iadr-dev/colab
 /plugin install @iadr-dev/colab
 /setup
 ```
@@ -43,7 +43,7 @@ npm install -g @iadr-dev/colab
 ohc setup
 ```
 
-`ohc setup` detects which platforms you want to support and writes the right config for each: `.claude/`, `.cursor/`, `.agent/`, `~/.codex/`, and `~/.gemini/extensions/oh-my-colab/`.
+`ohc setup` detects which platforms you want to support and writes the right config for each: `.claude/`, `.cursor/`, `.agents/`, `~/.codex/`, and `~/.gemini/extensions/oh-my-colab/`.
 
 ---
 
@@ -77,10 +77,10 @@ Core six:
 
 Meta-workflows:
 
-| Keyword       | Workflow      | What happens                                            |
-| ------------- | ------------- | ------------------------------------------------------- |
-| `"autopilot"` | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK    |
-| `"ralph"`     | **RALPH**     | BUILD with persistence until tests pass (or max iters)  |
+| Keyword       | Workflow      | What happens                                           |
+| ------------- | ------------- | ------------------------------------------------------ |
+| `"autopilot"` | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK   |
+| `"ralph"`     | **RALPH**     | BUILD with persistence until tests pass (or max iters) |
 
 Each workflow has a matching slash command (`/explore`, `/plan`, `/build`, …) for explicit invocation. Additional utility commands: `/team` (parallel pipeline), `/research` (cross-session doc cache), `/skill` (list/promote/draft), `/caveman` (compressed mode), `/ralph` (persistent build).
 
@@ -148,22 +148,22 @@ ohc team list                         # List all active teams
 
 "Trigger" is how the skill gets loaded: keyword phrases are matched by `hooks/on-user-prompt.js` against `hooks/keyword-map.json`; "referenced" skills are loaded by another skill or workflow.
 
-| Skill                           | Trigger                      | Enforces                                                                           |
-| ------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
-| **ohc-coding-discipline**       | always loaded                | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria |
-| **explore-codebase**            | `"explore"`, `"understand"`  | Reading order, PROJECT.md population                                               |
-| **brainstorming**               | referenced by writing-plans  | Socratic questioning, 2-3 approaches                                               |
-| **writing-plans**               | `"plan this"`, `"plan"`      | ≤2h tasks, confirmation gate before BUILD                                          |
-| **test-driven-development**     | `"tdd"`, `"test first"`      | RED-GREEN-REFACTOR, 0 failing 0 skipped                                            |
-| **subagent-driven-development** | referenced by BUILD workflow | Git worktrees, dispatch protocol                                                   |
-| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"` | Hypothesis before fix                                                    |
-| **requesting-code-review**      | `"review"`, `"code review"`  | Two-pass: spec then quality                                                        |
-| **finishing-a-branch**          | `"ship"`, `"ship it"`        | Pre-merge check, changelog, PR, cleanup                                            |
-| **retrospective**               | `"retro"`, `"retrospective"` | Session diff, pattern extraction, memory update                                    |
-| **context7-aware-coding**       | referenced when using libs   | Live docs via Context7 — cache-first via `.ohc/research/`, no guessing             |
-| **writing-skills**              | reference doc (meta)         | Skill authoring guide and structure                                                |
-| **ralph**                       | `"ralph"`, `"keep going"`, `/ralph` | Persistent BUILD until tests pass                                           |
-| **caveman**                     | `"caveman mode"`, `"compressed mode"` | Persistent compressed responses with technical accuracy                   |
+| Skill                           | Trigger                                | Enforces                                                                           |
+| ------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| **ohc-coding-discipline**       | always loaded                          | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria |
+| **explore-codebase**            | `"explore"`, `"understand"`            | Reading order, PROJECT.md population                                               |
+| **brainstorming**               | referenced by writing-plans            | Socratic questioning, 2-3 approaches                                               |
+| **writing-plans**               | `"plan this"`, `"plan"`                | ≤2h tasks, confirmation gate before BUILD                                          |
+| **test-driven-development**     | `"tdd"`, `"test first"`                | RED-GREEN-REFACTOR, 0 failing 0 skipped                                            |
+| **subagent-driven-development** | referenced by BUILD workflow           | Git worktrees, dispatch protocol                                                   |
+| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"` | Hypothesis before fix                                                              |
+| **requesting-code-review**      | `"review"`, `"code review"`            | Two-pass: spec then quality                                                        |
+| **finishing-a-branch**          | `"ship"`, `"ship it"`                  | Pre-merge check, changelog, PR, cleanup                                            |
+| **retrospective**               | `"retro"`, `"retrospective"`           | Session diff, pattern extraction, memory update                                    |
+| **context7-aware-coding**       | referenced when using libs             | Live docs via Context7 — cache-first via `.ohc/research/`, no guessing             |
+| **writing-skills**              | reference doc (meta)                   | Skill authoring guide and structure                                                |
+| **ralph**                       | `"ralph"`, `"keep going"`, `/ralph`    | Persistent BUILD until tests pass                                                  |
+| **caveman**                     | `"caveman mode"`, `"compressed mode"`  | Persistent compressed responses with technical accuracy                            |
 
 Each skill: `SKILL.md` (≤200 lines) + `references/` (on demand) + `scripts/` (output only).
 
