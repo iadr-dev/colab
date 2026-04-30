@@ -10,6 +10,14 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.3] — 2026-04-30
+
+### Changed
+
+- Claude marketplace plugin `source` set to the public GitHub repository URL (replacing local `./`).
+
+---
+
 ## [0.4.2] — 2026-04-30
 
 ### Changed
@@ -197,7 +205,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/iadr-dev/colab/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/iadr-dev/colab/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/iadr-dev/colab/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/iadr-dev/colab/compare/v0.3.1...v0.4.0
