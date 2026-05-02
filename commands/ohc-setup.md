@@ -1,8 +1,9 @@
 ---
+name: ohc-setup
 description: Run interactive oh-my-colab onboarding: platforms, MCP, HUD
 ---
 
-# /setup — Onboarding
+# /ohc-setup — Onboarding
 
 Run the interactive setup wizard. Installs oh-my-colab for detected platforms.
 

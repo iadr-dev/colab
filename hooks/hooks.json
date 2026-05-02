@@ -1,5 +1,5 @@
 {
-  "_comment": "Anthropic verbose-format hook manifest. Deployed by setup/index.js to .claude/hooks/. This is the single source of hook registration — plugin.json no longer carries inline hook entries.",
+  "_comment": "Verbose-format hook manifest for ohc setup (copied to .claude/hooks/). For Claude marketplace installs, see hooks/plugin-hooks.json (nested + ${CLAUDE_PLUGIN_ROOT}) referenced from .claude-plugin/plugin.json.",
   "hooks": [
     {
       "event": "SessionStart",

@@ -1,19 +1,26 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "oh-my-colab",
-  "version": "0.4.6",
-  "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory.",
+  "version": "0.4.7",
+  "description": "Team-first AI coding workflows: methodology, orchestration, and persistent memory (Claude Code + multi-platform CLI). Ships skills, slash commands, agents, and hooks. Use npm ohc setup for full cross-platform onboarding.",
   "author": {
     "name": "iadr-dev",
     "url": "https://github.com/iadr-dev"
   },
   "homepage": "https://github.com/iadr-dev/colab",
+  "repository": "https://github.com/iadr-dev/colab",
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "workflow",
-    "multi-agent",
-    "teams",
-    "memory"
+    "skills",
+    "agents",
+    "hooks",
+    "workflows",
+    "tdd",
+    "teams"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "hooks": "./hooks/plugin-hooks.json"
 }

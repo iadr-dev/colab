@@ -10,6 +10,28 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.7] — 2026-05-02
+
+### Added
+
+- **document-intake** skill and **`/ohc-document-intake`** command; Sources + Traceability in plan templates (`writing-plans`)
+- **`CONTEXT.md`** / **`CONTEXT-MAP.md`** templates and optional **`ohc setup`** seeding
+- **`ohc doctor`** (`scripts/doctor.js`) for workspace health hints
+- **`hooks/plugin-hooks.json`** plus **`hooks/resolve-paths.js`** (`CLAUDE_PLUGIN_ROOT` fallback)
+- **`finishing-a-branch/references/production-checklist.md`**
+- Cross-platform **`npm test`** via **`tests/smoke/run-smoke.js`** (Windows Node subset; bash remains **`npm run test:shell`**)
+
+### Changed
+
+- Claude Code slash commands renamed to **`/ohc-*`** with sources under **`commands/ohc-*.md`**; YAML **`name`** matches stem (**`hooks/keyword-map.json`**: **`/ohc-ralph`** etc.)
+- **README**, **templates** (`CLAUDE`, `SOUL`, Cursor rules, Antigravity), and hooks copy reference **`hooks/keyword-map.json`**, MCP **`needsKey`** behavior, and full slash list
+
+### Removed
+
+- Redundant mirrored workflow stubs under **`skills/`** (`build`, `explore`, `plan`, …) in favor of plugin commands plus methodology skills
+
+---
+
 ## [0.4.6] — 2026-04-30
 
 ### Changed

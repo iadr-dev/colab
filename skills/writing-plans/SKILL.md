@@ -11,6 +11,9 @@ allowed-tools: Read Write
 
 Run before building anything estimated at >30 minutes.
 
+## Externally maintained specifications
+If PRDs, RFCs, or other authoritative docs live outside oh-my-colab conventions, run **`document-intake`** first so `.ohc/doc-sources.md` and reconciliation are settled. Shorten Step 1 to **unanswered questions, document↔repository conflicts, and ambiguous acceptance**. Always include **Sources** and **Traceability** (`assets/plan-template.md`).
+
 ## Step 1: Deep Interview (3–5 questions max)
 
 Clarify before designing:

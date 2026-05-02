@@ -5,6 +5,7 @@ task list to the code and product model.
 
 ## Read before planning
 
+- **`document-intake`** when the team’s truth lives in **external** specs (paths, URLs); own formats stay as-is — only `.ohc/doc-sources.md` + traced plan mirror execution needs.
 - `.ohc/PROJECT.md` for the primary OHC project memory: stack, conventions,
   architecture notes, and known gotchas.
 - `CONTEXT.md` for optional domain terms in single-context repos.

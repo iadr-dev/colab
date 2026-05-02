@@ -1,8 +1,9 @@
 ---
+name: ohc-ship
 description: SHIP workflow: pre-merge check → changelog → PR description → clean worktrees
 ---
 
-# /ship — SHIP Workflow
+# /ohc-ship — SHIP Workflow
 
 Steps:
 1. Run: bash skills/finishing-a-branch/scripts/pre-merge-check.sh

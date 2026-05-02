@@ -55,7 +55,8 @@ Test on at least Claude Code + one other (Cursor or Antigravity preferred).
 git clone https://github.com/iadr-dev/colab
 cd colab
 npm install
-npm test         # run smoke tests
+npm test         # smoke (Node subset on Windows; bash on Unix/Git Bash when available)
+npm run test:shell  # optional — always runs bash test-all.sh (symlink worktree check)
 npm run lint:skills  # check SKILL.md line counts
 ```
 

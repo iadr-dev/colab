@@ -72,7 +72,7 @@ jobs:
         run: |
           FAILED=0
           for f in package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json \
-                   .cursor-plugin/manifest.json hooks/hooks.json hooks/keyword-map.json; do
+                   .cursor-plugin/manifest.json hooks/hooks.json hooks/keyword-map.json hooks/plugin-hooks.json; do
             node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" 2>/dev/null \
               && echo "✓ $f" || { echo "✗ $f — invalid JSON"; FAILED=1; }
           done

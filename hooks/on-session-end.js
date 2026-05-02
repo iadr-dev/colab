@@ -86,7 +86,7 @@ rl.on('close', () => {
     parts.push(`<system_reminder session_end="true">
 Session ended after ${durationMin} minutes.
 Learnings have NOT been captured yet.
-Run /retro to distill what worked, what failed, and update memory files before the context is lost.
+Run /ohc-retro to distill what worked, what failed, and update memory files before the context is lost.
 </system_reminder>`);
   }
 

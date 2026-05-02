@@ -37,6 +37,7 @@ echo ""
 # JSON validity
 run "hooks/hooks.json is valid JSON"     node -e "JSON.parse(require('fs').readFileSync('$ROOT/hooks/hooks.json','utf8'))"
 run "hooks/keyword-map.json is valid"    node -e "JSON.parse(require('fs').readFileSync('$ROOT/hooks/keyword-map.json','utf8'))"
+run "hooks/plugin-hooks.json is valid"   node -e "JSON.parse(require('fs').readFileSync('$ROOT/hooks/plugin-hooks.json','utf8'))"
 run "plugin.json is valid"               node -e "JSON.parse(require('fs').readFileSync('$ROOT/.claude-plugin/plugin.json','utf8'))"
 run "package.json is valid"              node -e "JSON.parse(require('fs').readFileSync('$ROOT/package.json','utf8'))"
 

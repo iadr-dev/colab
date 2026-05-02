@@ -21,44 +21,52 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 | Jumps to code without planning                        | Enforced PLAN gate for tasks >30 minutes                              |
 | "Done" without running tests                          | Verifier agent reads actual output — 0 failing, 0 skipped             |
 | Only works with one platform                          | 5 platforms: Claude Code, Cursor, Antigravity, Codex, Gemini          |
-| Parallel agents can't coordinate or verify each other | `/team` five-stage pipeline with `RESULT.json` gate + auto fix loop   |
+| Parallel agents can't coordinate or verify each other | `/ohc-team` five-stage pipeline with `RESULT.json` gate + auto fix loop   |
 | No learning loop                                      | RETRO extracts skills from every session                              |
 
 ---
 
 ## Install
 
-### Claude Code (plugin)
-
-```
-/plugin marketplace add https://github.com/iadr-dev/colab
-/plugin install @iadr-dev/colab
-/setup
-```
-
-### Everything else (Cursor, Antigravity, Codex CLI, Gemini CLI, plus Claude Code via npm)
+### Everything else (Claude, Cursor, Antigravity, Codex CLI, Gemini CLI, plus Claude Code via npm)
 
 ```bash
 npm install -g @iadr-dev/colab
 ohc setup
 ```
 
-`ohc setup` detects which platforms you want to support and writes the right config for each: `.claude/`, `.cursor/`, `.agents/`, `~/.codex/`, and `~/.gemini/extensions/oh-my-colab/`.
+`ohc setup` detects which platforms you want to support and writes the right config for each: `.claude/` (Claude Code; Cursor may reuse it for compatibility), `.cursor/`, project `.agents/` (Antigravity rules/skills/workflows; Codex also loads skills from `.agents/skills/`), project `GEMINI.md` plus user `~/.gemini/settings.json` (Gemini CLI MCP), user `~/.gemini/antigravity/mcp_config.json` when Antigravity is enabled, and user `~/.codex/` (Codex prompts + `config.toml` MCP tables). Optional: seed **`CONTEXT.md`** / **`CONTEXT-MAP.md`** from `templates/` into the repo root as a bounded domain glossary.
+
+### Claude Code plugin (marketplace / git)
+
+Bundled manifests live under **[`.claude-plugin/`](.claude-plugin/)** (metadata only). Ships **`skills/`**, **`agents/`**, plugin hooks (**[`hooks/plugin-hooks.json`](hooks/plugin-hooks.json)** with **`${CLAUDE_PLUGIN_ROOT}`** per [plugins reference](https://docs.claude.com/en/docs/claude-code/plugins-reference)), and Claude slash definitions as **`commands/ohc-*.md`** (Workflows section lists them). **`ohc setup`** copies the verbose **[`hooks/hooks.json`](hooks/hooks.json)** into `.claude/hooks/` when you onboard a project workspace (and mirrors commands into `.claude/commands/`).
+
+Develop from this repo:
+
+```bash
+/plugin marketplace add ./.claude-plugin/marketplace.json
+/plugin install oh-my-colab --scope project
+```
+
+Use **`npm i -g @iadr-dev/colab && ohc setup`** when you want the full multi-platform scaffold (recommended together with or after the Claude plugin).
+
 
 ---
 
 ## How it works
 
-Every session starts by reading four files — always, in this order:
+Every session starts by reading **global + project memory** — always, in this order:
 
 ```
-SOUL.md     → who the agent is (constant)
-USER.md     → who you are (your preferences, stack, style)
-PROJECT.md  → what this project is (stack, conventions, gotchas)
-notepad.md  → what's in progress right now (human-editable)
+~/.ohc/SOUL.md     → who the agent is (constant)
+~/.ohc/USER.md     → who you are (your preferences, stack, style)
+.ohc/PROJECT.md    → what this project is (stack, conventions, gotchas)
+.ohc/notepad.md    → what's in progress right now (human-editable)
 ```
 
-**You can edit `notepad.md` directly between sessions.** Write for your future self or teammate. The agent picks up exactly where you left off.
+Paths are created by **`ohc setup`** (`PROJECT.md` / `notepad.md` under `.ohc/` in the repo; `SOUL.md` / `USER.md` under `~/.ohc/` by default).
+
+**You can edit `.ohc/notepad.md` directly between sessions.** Write for your future self or teammate. The agent picks up exactly where you left off.
 
 ---
 
@@ -68,9 +76,9 @@ Core six:
 
 | Keyword       | Workflow    | What happens                                                  |
 | ------------- | ----------- | ------------------------------------------------------------- |
-| `"explore"`   | **EXPLORE** | Reads codebase, populates `PROJECT.md`                        |
-| `"plan this"` | **PLAN**    | Interview → approaches → task list → confirms before building |
-| `"build"`     | **BUILD**   | Loads plan → subagents → TDD → verifier                       |
+| `"explore"`   | **EXPLORE** | Reads codebase, populates `.ohc/PROJECT.md`                        |
+| `"plan this"` | **PLAN**    | Interview → approaches → task list → confirms before building (`"design this"` routes here too — see **`hooks/keyword-map.json`**) |
+| `"build"`     | **BUILD**   | Loads plan → subagents → TDD → verifier (`"implement"` synonyms in keyword map) |
 | `"review"`    | **REVIEW**  | Spec compliance + code quality report                         |
 | `"ship it"`   | **SHIP**    | Pre-merge check → changelog → PR → clean                      |
 | `"retro"`     | **RETRO**   | Session diff → patterns → update memory files                 |
@@ -79,14 +87,24 @@ Meta-workflows:
 
 | Keyword       | Workflow      | What happens                                           |
 | ------------- | ------------- | ------------------------------------------------------ |
-| `"autopilot"` | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK   |
-| `"ralph"`     | **RALPH**     | BUILD with persistence until tests pass (or max iters) |
+| `"autopilot"` | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK (`"full auto"` skips that gate) |
+| `"ralph"`     | **RALPH**     | BUILD with persistence until tests pass (or max iters); **`/ohc-ralph`** maps in **`hooks/keyword-map.json`** |
 
-Each workflow has a matching slash command (`/explore`, `/plan`, `/build`, …) for explicit invocation. Additional utility commands: `/team` (parallel pipeline), `/research` (cross-session doc cache), `/skill` (list/promote/draft), `/caveman` (compressed mode), `/ralph` (persistent build).
+Keyword routing is authoritative; edits go in **`hooks/keyword-map.json`** (picked up by **`hooks/on-user-prompt.js`**).
+
+### Claude Code plugin — slash commands
+
+Plugin Markdown lives under **`commands/ohc-*.md`** (shown in Claude Code as **`/ohc-…`**):
+
+`/ohc-setup` · `/ohc-explore` · `/ohc-plan` · `/ohc-build` · `/ohc-review` · `/ohc-ship` · `/ohc-retro` · `/ohc-autopilot` · `/ohc-team` · `/ohc-research` · `/ohc-skill` · `/ohc-caveman` · `/ohc-ralph` · `/ohc-document-intake`
+
+Each workflow row above aligns with keywords; these slashes are explicit equivalents (plus **`/ohc-setup`** onboarding and **`/ohc-document-intake`** for external specs).
 
 ---
 
 ## Nine agents
+
+Definitions live in **`agents/*.md`** (nine files). Routed on Claude Code with the models below:
 
 | Agent        | Model  | Role                                     |
 | ------------ | ------ | ---------------------------------------- |
@@ -100,7 +118,7 @@ Each workflow has a matching slash command (`/explore`, `/plan`, `/build`, …) 
 | writer       | haiku  | Changelogs, PR descriptions              |
 | collaborator | sonnet | Team handoffs, notepad updates           |
 
-The `Model` column is the Claude Code subagent model routing and applies only on Claude Code. On other platforms the agent `.md` files are rule/role references — the host platform decides which model runs.
+The `Model` column is the Claude Code subagent model routing and applies only on Claude Code. On other platforms the agent `.md` files are rule/role references — the host platform decides which model runs. **`hooks/keyword-map.json`** also maps **"handoff"** / **"picking up"** phrases to the **collaborator** agent.
 
 ---
 
@@ -108,7 +126,7 @@ The `Model` column is the Claude Code subagent model routing and applies only on
 
 ```bash
 # Claude Code — native team mode (Task() dispatch)
-/team 3:executor "implement the 3 tasks in .ohc/plans/auth-feature.md"
+/ohc-team 3:executor "implement the 3 tasks in .ohc/plans/auth-feature.md"
 
 # CLI — tmux workers
 ohc team 2:codex "security review of src/auth"
@@ -150,20 +168,24 @@ ohc team list                         # List all active teams
 
 | Skill                           | Trigger                                | Enforces                                                                           |
 | ------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| **ohc-coding-discipline**       | always loaded                          | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria |
-| **explore-codebase**            | `"explore"`, `"understand"`            | Reading order, PROJECT.md population                                               |
-| **brainstorming**               | referenced by writing-plans            | Socratic questioning, 2-3 approaches                                               |
-| **writing-plans**               | `"plan this"`, `"plan"`                | ≤2h tasks, confirmation gate before BUILD                                          |
+| **ohc-coding-discipline**       | **`CLAUDE.md` / Cursor rules norms** + keywords **`"discipline"`**, **`"scope check"`** | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria |
+| **explore-codebase**            | `"explore"`, `"explore codebase"`, `"understand"` | Reading order, `.ohc/PROJECT.md` population                                               |
+| **brainstorming**               | referenced by writing-plans            | Socratic questioning; `references/product-brief-template.md` for greenfield framing |
+| **writing-plans**               | `"plan this"`; substring **`plan `**; **`write a plan`** | ≤2h tasks, confirmation gate before BUILD                                          |
+| **autopilot**                   | `"autopilot"`, `"auto pilot"`, `"full auto"`; **`/ohc-autopilot`** | PLAN → BUILD → REVIEW chain (**`full auto`** skips plan gate in keyword map)     |
+| **document-intake**             | `"from my docs"`, `"existing spec"`, `"external spec"`, **`"document intake"`**, **`/ohc-document-intake`** | Respect third-party PRD/RFC layouts; emit `.ohc/doc-sources.md` + traced `.ohc/plans/` |
 | **test-driven-development**     | `"tdd"`, `"test first"`                | RED-GREEN-REFACTOR, 0 failing 0 skipped                                            |
 | **subagent-driven-development** | referenced by BUILD workflow           | Git worktrees, dispatch protocol                                                   |
-| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"` | Hypothesis before fix                                                              |
-| **requesting-code-review**      | `"review"`, `"code review"`            | Two-pass: spec then quality                                                        |
-| **finishing-a-branch**          | `"ship"`, `"ship it"`                  | Pre-merge check, changelog, PR, cleanup                                            |
+| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"`, **`"why is"`** | Hypothesis before fix                                                              |
+| **requesting-code-review**      | `"review"`, `"code review"`, **`"check this"`** | Two-pass: spec then quality                                                        |
+| **finishing-a-branch**          | `"ship"`, `"ship it"`, **`"finish branch"`** | Pre-merge check, changelog, PR, cleanup + optional **`references/production-checklist.md`** |
 | **retrospective**               | `"retro"`, `"retrospective"`           | Session diff, pattern extraction, memory update                                    |
 | **context7-aware-coding**       | referenced when using libs             | Live docs via Context7 — cache-first via `.ohc/research/`, no guessing             |
 | **writing-skills**              | reference doc (meta)                   | Skill authoring guide and structure                                                |
-| **ralph**                       | `"ralph"`, `"keep going"`, `/ralph`    | Persistent BUILD until tests pass                                                  |
-| **caveman**                     | `"caveman mode"`, `"compressed mode"`  | Persistent compressed responses with technical accuracy                            |
+| **ralph**                       | `"ralph"`, `"keep going"`, `"ralph mode"`, **`/ohc-ralph`** | Persistent BUILD until tests pass                                                  |
+| **caveman**                     | **`"stop caveman"`** / **`"normal mode"`** (exit); **`"caveman mode"`**, **`"compressed mode"`** (enter) | Persistent compressed responses with technical accuracy                            |
+
+The repo ships **16** skills under **`skills/*/SKILL.md`**. Canonical keyword list: **`hooks/keyword-map.json`**.
 
 Each skill: `SKILL.md` (≤200 lines) + `references/` (on demand) + `scripts/` (output only).
 
@@ -178,9 +200,11 @@ Each skill: `SKILL.md` (≤200 lines) + `references/` (on demand) + `scripts/` (
 | **Brave Search** | Web search              | `BRAVE_API_KEY`                           |
 | **Playwright**   | Browser automation, e2e | No                                        |
 | **Firecrawl**    | Web scraping            | `FIRECRAWL_API_KEY`                       |
-| **Linear**       | Project management      | `LINEAR_API_KEY`                          |
-| **Sentry**       | Error monitoring        | `SENTRY_AUTH_TOKEN`                       |
-| **Figma**        | Design context          | `FIGMA_API_KEY`                           |
+| **Linear**       | Remote MCP (`mcp.linear.app`) | No secret in default `ohc setup` (`scripts/setup/index.js`) |
+| **Sentry**       | Hosted MCP (`mcp.sentry.dev`)   | No secret in default setup (add auth if your org requires it) |
+| **Figma**        | Hosted MCP (`mcp.figma.com`)    | No secret in default setup (add tokens if your org requires it) |
+
+Interactive **`ohc setup`** only prompts for env vars where **`scripts/setup/index.js`** marks **`needsKey: true`** for your selection (Context7 remains optional).
 
 ---
 
@@ -197,14 +221,15 @@ ohc research prune [--older-than N]   # Remove expired / >N-day entries
 ohc research clear                    # Nuke the cache
 ```
 
-Default TTL is 30 days. `on-session-end.js` auto-prunes stale entries. In `/team` mode, the cache directory is symlinked into every worker worktree so the whole team shares one source of truth.
+Default TTL is 30 days. `on-session-end.js` auto-prunes stale entries. In `/ohc-team` mode, the cache directory is symlinked into every worker worktree so the whole team shares one source of truth.
 
 ---
 
 ## ohc CLI
 
 ```bash
-ohc setup                          # Interactive 5-screen onboarding
+ohc setup                          # Interactive onboarding (+ optional CONTEXT templates)
+ohc doctor                         # Health: .ohc, hooks JSON, MCP env hints, semver (colab devs)
 ohc team N:provider "task"         # Spawn a team — see "Parallel team support" above
 ohc research list | show | search  # Cross-session research cache
 ohc skill list                     # List installed + draft skills
@@ -231,12 +256,13 @@ These are not suggestions. The hooks, skills, and workflow gates enforce them.
 
 ## Contributing
 
-Before contributing a skill: read `skills/writing-skills/SKILL.md`.
+Before contributing a skill: read `skills/writing-skills/SKILL.md`. Claude Code slash sources live in **`commands/ohc-*.md`**; keep **`name`** in YAML frontmatter in sync with the filename stem.
 
 - `SKILL.md` must be ≤200 lines (CI blocks if not)
 - Move detailed content to `references/`
 - Move executable tools to `scripts/`
 - Test on Claude Code + at least one other platform
+- **`npm test`** runs a Node subset on Windows; full bash smoke (symlink worktree): `npm run test:shell` (Git Bash / WSL / Linux/macOS)
 
 ---
 

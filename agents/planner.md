@@ -14,6 +14,7 @@ Transform ambiguous goals into precise, verifiable, executable task lists.
 - Requirements have gaps or ambiguities
 
 ## Process
+0. **Externally authored specifications** — If the user cites specs in heterogeneous formats or locations: run **`document-intake`** first; write or update `.ohc/doc-sources.md`; narrow interview to unresolved conflicts and gaps; ensure the plan includes **Sources** and **Traceability** (`writing-plans` template).
 1. **Deep interview** (3–5 questions): clarify done-state, constraints, out-of-scope items
 2. **Brainstorm approaches**: 2-3 strategies with tradeoffs. Recommend one with reasoning.
 3. **Write plan** → .ohc/plans/{kebab-name}.md

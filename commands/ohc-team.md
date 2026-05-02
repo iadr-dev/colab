@@ -1,9 +1,10 @@
 ---
-description: Spawn N parallel agent workers that run an internal five-stage pipeline (plan → prd → exec → verify → fix → merge). Usage: /team N:provider "task".
+name: ohc-team
+description: Spawn N parallel agent workers that run an internal five-stage pipeline (plan → prd → exec → verify → fix → merge). Usage: /ohc-team N:provider "task".
 argument-hint: "N:provider \"task\" | status <id> | advance <id> | poll <id> | merge <id> | shutdown <id> [--force]"
 ---
 
-# /team — Parallel Team Pipeline
+# /ohc-team — Parallel Team Pipeline
 
 Spawn N workers that run a **five-stage pipeline** internally:
 
@@ -17,9 +18,9 @@ refuses to advance unless each worker has written `RESULT.json`.
 
 ## Quick Start
 ```
-/team 1:executor "fix all TypeScript errors"
-/team 2:codex    "review auth module for security issues"
-/team 1:gemini   "redesign the onboarding flow"
+/ohc-team 1:executor "fix all TypeScript errors"
+/ohc-team 2:codex    "review auth module for security issues"
+/ohc-team 1:gemini   "redesign the onboarding flow"
 ```
 
 ## Providers
@@ -84,7 +85,7 @@ Every worker MUST produce two files before exit:
 
 ## Typical flow
 ```bash
-/team 2:executor "implement the 3 tasks in .ohc/plans/auth-feature.md"
+/ohc-team 2:executor "implement the 3 tasks in .ohc/plans/auth-feature.md"
 # … workers run in parallel, each writes RESULT.json when done …
 ohc team status <id>          # confirm all workers succeeded
 ohc team advance <id>         # team-exec → team-verify

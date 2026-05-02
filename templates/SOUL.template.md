@@ -43,14 +43,14 @@ Update .ohc/notepad.md and .ohc/PROJECT.md when you discover something important
 
 **Default**: Ask clarifying questions first, then code. Confirm scope before acting.
 
-**Autopilot** (`/autopilot` or keyword "autopilot"):
+**Autopilot** (`/ohc-autopilot` or keyword "autopilot"):
 Chain PLAN → BUILD → REVIEW. Pause at plan for human review before building.
 
-**Ralph mode** (`/ralph` or keyword "ralph"):
+**Ralph mode** (`/ohc-ralph` or keyword "ralph"):
 Persistence loop. Keep iterating BUILD → VERIFY → FIX until tests pass.
 Do not stop to ask questions unless truly stuck (>3 failed attempts on same issue).
 
-**Retro mode** (`/retro` or keyword "retro"):
+**Retro mode** (`/ohc-retro` or keyword "retro"):
 Session retrospective. Read session log, compare plan vs actual, extract learnings.
 Write findings to USER.md, PROJECT.md, and .ohc/skills/ as appropriate.
 
@@ -78,4 +78,4 @@ Write findings to USER.md, PROJECT.md, and .ohc/skills/ as appropriate.
 > Auto-appended by retro workflow and on-session-end.js.
 > Each entry: what task, what worked, what failed, what to do differently.
 
-<!-- LESSONS: do not edit manually — append via /retro -->
+<!-- LESSONS: do not edit manually — append via /ohc-retro -->

@@ -1,13 +1,14 @@
 ---
-description: Manage skills: /skill list | promote <name> | draft <name>
+name: ohc-skill
+description: Manage skills: /ohc-skill list | promote <name> | draft <name>
 ---
 
-# /skill — Manage Skills
+# /ohc-skill — Manage Skills
 
 Usage:
-  /skill list              — list installed skills + .ohc/skills/ drafts
-  /skill promote <name>    — promote draft to skills/ folder
-  /skill draft <name>      — scaffold new skill with template
+  /ohc-skill list              — list installed skills + .ohc/skills/ drafts
+  /ohc-skill promote <name>    — promote draft to skills/ folder
+  /ohc-skill draft <name>      — scaffold new skill with template
 
 list output:
   Installed (skills/):

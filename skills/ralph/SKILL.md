@@ -1,80 +1,28 @@
 ---
 name: ralph
 description: >
-  Activate the ralph persistence loop. Use when you want to keep iterating
-  BUILD → VERIFY → FIX until the goal is met or you're blocked N times.
-  Ralph is PRD-driven: it writes a product requirement document, works stories
-  one at a time, and picks up exactly where it left off after any Stop.
-  Trigger: "ralph", "/ralph", "ralph mode", "keep going until done".
-allowed-tools: Read Write Edit MultiEdit Bash Task
+  PRD-loop persistence mode: iterate BUILD until verifier passes or max blocked attempts.
+  Triggers ralph keep going keywords and /ohc-ralph. Deactivate via stop ralph.
+allowed-tools: Read Write Bash
 ---
 
-# Ralph — Persistence Loop Protocol
+# Ralph persistence
 
-## What Ralph Does
-Ralph is a PRD-driven build loop that keeps going until every story in the PRD is green.
-It is not an infinite loop — it has a `max_iterations` ceiling per story and a `stop_on_blocked` gate.
+Operate with **`scripts/ralph.js`** and session state files.
 
-```
-ACTIVATE ralph
-  ↓
-Does .ohc/state/ralph-state.json exist?
-  YES → resume from saved state
-  NO  → write PRD, initialize state
-  ↓
-LOOP:
-  1. Read current story from PRD
-  2. Executor builds story
-  3. Verifier checks (run tests)
-  4. If PASS → mark story complete, advance to next
-  5. If FAIL → increment attempt_count
-     - If attempt_count < stop_on_blocked → retry with fix
-     - If attempt_count >= stop_on_blocked → PAUSE, report to human
-  6. If all stories complete → deactivate ralph, run /retro
-```
+## Lifecycle
 
-## Activation
-Say "ralph mode", "/ralph", or "ralph: [task description]"
+1. **Activate** via keyword `"ralph"`, `"keep going"`, or `/ohc-ralph`. On first run without an active PRD, the script initializes `.ohc/state/sessions/<id>/prd.json` from the current task narrative.
+2. **Loop** — execute BUILD iteration; verifier runs tests; persist `RESULT`-style narrative in worker notes where applicable.
+3. **Advance** — on success mark story done and move to next `prd.stories[]` entry; on repeated block update `attempt_count`; hard-stop after `stopOnBlocked` (keyword-map default **3**).
+4. **Deactivate** — user says `"stop ralph"` or `"ralph stop"` (clears active skill flag in `.ohc/state/active-skills.json`).
 
-If a task description is provided, ralph writes the PRD from it.
-If no description, ralph resumes the active PRD.
+## State files
 
-## State File (managed by scripts/ralph.js)
-`.ohc/state/ralph-state.json`:
-```json
-{
-  "active": true,
-  "prd_path": ".ohc/state/sessions/<id>/prd.json",
-  "current_story": 0,
-  "total_stories": 3,
-  "attempt_count": 0,
-  "max_iterations": 10,
-  "stop_on_blocked": 3,
-  "started_at": "ISO8601"
-}
-```
+- `.ohc/state/ralph-state.json` — active session id, story index, iteration counters
+- `.ohc/state/sessions/<id>/prd.json` — `{ goal, stories:[{title,status,attempt_count}], ... }` per `scripts/ralph.js`
 
-## PRD Format (`.ohc/state/sessions/<id>/prd.json`)
-```json
-{
-  "goal": "description of what done looks like",
-  "stories": [
-    { "id": 1, "title": "...", "status": "pending|in_progress|done|blocked", "success_criterion": "..." }
-  ]
-}
-```
+## Guardrails
 
-## Stopping Ralph
-- Say "stop ralph" or "ralph stop" — deactivates persistence mode
-- Ralph auto-stops when all stories are complete
-- Ralph auto-pauses when `stop_on_blocked` attempts fail on the same story
-
-## Continuation After Stop
-When a session ends with ralph active, `on-stop.js` injects:
-> "Ralph is active. Continue iteration N+1 on story X."
-The next session picks this up from session start context.
-
-## Gotchas
-- Ralph does not skip the verifier — it always runs tests before marking a story done
-- Ralph does not expand scope silently — new stories require explicit user approval
-- If you get stuck, say "stop ralph" and examine with the debugger agent first
+- Do not claim DONE without verifier-aligned evidence.
+- If stories are ambiguous, widen them only after syncing with **`writing-plans`** or user OK.

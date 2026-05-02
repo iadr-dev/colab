@@ -12,6 +12,7 @@
 const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { keywordMapJson, skillSkillMd } = require('./resolve-paths');
 
 const CWD = process.cwd();
 const OHC = path.join(CWD, '.ohc');
@@ -26,13 +27,13 @@ function writeJson(p, data) {
   fs.writeFileSync(p, JSON.stringify(data, null, 2));
 }
 function readSkillReminder(skill, reason) {
-  const skillPath = path.join(CWD, 'skills', skill, 'SKILL.md');
-  const content = read(skillPath);
+  const { abs, rel } = skillSkillMd(CWD, skill);
+  const content = read(abs);
   if (!content) return null;
   return `<system_reminder skill="${skill}">
 ${reason}
 ${content.split('\n').slice(0, 40).join('\n')}
-(Full instructions: skills/${skill}/SKILL.md)
+(Full instructions: ${rel})
 </system_reminder>`;
 }
 function activeSkillsPath() {
@@ -50,7 +51,7 @@ function setActiveSkill(skill, isActive) {
 }
 
 let keywordMap = {};
-try { keywordMap = JSON.parse(read(path.join(CWD, 'hooks', 'keyword-map.json')) || '{}'); }
+try { keywordMap = JSON.parse(read(keywordMapJson(CWD)) || '{}'); }
 catch {}
 
 let raw = '';
@@ -105,7 +106,7 @@ Keyword "${kw}" detected. Deactivating persistent skill: ${cfg.skill}
       reminders.push(`<system_reminder workflow="${cfg.workflow}">
 Keyword "${kw}" detected. Run ${cfg.workflow} workflow.
 ${cfg.planGate ? 'Gate: pause at plan for human confirmation before BUILD.' : ''}
-${cfg.persistence ? `Mode: persistence — keep going until tests pass (stop after ${cfg.stopOnBlocked || 3} blocked attempts).` : ''}
+${(cfg.mode === 'persistence' || cfg.persistence) ? `Mode: persistence — keep going until tests pass (stop after ${cfg.stopOnBlocked || 3} blocked attempts).` : ''}
 </system_reminder>`);
     }
 

@@ -52,3 +52,8 @@ Run full test suite on branch tip. Do not proceed if any test fails or skips.
 git worktree list | grep ohc/ | awk '{print $1}' | xargs -I{} git worktree remove {}
 git branch | grep ohc/ | xargs git branch -d
 ```
+
+## Optional: Production readiness checklist
+
+For production-grade merges, skim `references/production-checklist.md` and satisfy or explicitly defer items.
+

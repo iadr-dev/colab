@@ -9,6 +9,10 @@
   "plan this":        { "skill": "writing-plans",                 "mode": "pipeline" },
   "plan ":            { "skill": "writing-plans",                 "mode": "pipeline" },
   "write a plan":     { "skill": "writing-plans",                 "mode": "pipeline" },
+  "from my docs":     { "skill": "document-intake",                "mode": "single" },
+  "existing spec":    { "skill": "document-intake",                "mode": "single" },
+  "external spec":    { "skill": "document-intake",                "mode": "single" },
+  "document intake":  { "skill": "document-intake",                 "mode": "single" },
   "design this":      { "workflow": "PLAN",                       "mode": "pipeline" },
 
   "build":            { "workflow": "BUILD",                      "mode": "dispatch" },
@@ -24,7 +28,7 @@
   "stop ralph":       { "skill": "ralph",                        "mode": "persistent", "action": "deactivate" },
   "ralph stop":       { "skill": "ralph",                        "mode": "persistent", "action": "deactivate" },
   "ralph mode":       { "skill": "ralph",                        "mode": "persistent", "action": "activate" },
-  "/ralph":           { "skill": "ralph",                        "mode": "persistent", "action": "activate" },
+  "/ohc-ralph":       { "skill": "ralph",                        "mode": "persistent", "action": "activate" },
 
   "review":           { "skill": "requesting-code-review",        "mode": "single" },
   "code review":      { "skill": "requesting-code-review",        "mode": "single" },

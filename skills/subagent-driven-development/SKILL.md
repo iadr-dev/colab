@@ -50,7 +50,7 @@ Save to `.ohc/state/dispatch-{id}.json`:
 ```bash
 ohc team 3:claude "implement tasks from .ohc/state/dispatch-*.json"
 ```
-Or: `/team 3:executor` in Claude Code with task specs attached.
+Or: `/ohc-team 3:executor` in Claude Code with task specs attached.
 
 ### 4. Merge results
 ```bash

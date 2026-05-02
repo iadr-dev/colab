@@ -1,14 +1,13 @@
 ---
-name: retro
-description: RETRO workflow — session diff → extract patterns → update memory files → draft skills
-argument-hint: "[brief]"
+name: ohc-retro
+description: RETRO workflow: session diff → extract patterns → update memory files → draft skills
 ---
 
-# /retro — RETRO Workflow
+# /ohc-retro — RETRO Workflow
 
 Usage:
-  /retro        — full retrospective
-  /retro brief  — 3-sentence summary only
+  /ohc-retro        — full retrospective
+  /ohc-retro brief  — 3-sentence summary only
 
 Steps:
 1. Run: python3 skills/retrospective/scripts/extract-patterns.py
