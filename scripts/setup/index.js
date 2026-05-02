@@ -56,27 +56,26 @@ async function run() {
     options: ['Autopilot (plan + build + review)', 'Plan-first', 'TDD-strict', 'Freestyle'],
   }) || ['Autopilot (plan + build + review)'];
 
-  // Screen 4: MCP servers
-  const existingMcp = detectExistingMcp(platforms);
-  const mcpLabels = MCP_SERVERS.map(s => {
-    return existingMcp.has(s.name) ? `${s.label} (detected)` : s.label;
-  });
+  // Screen 4: MCP servers — detection is per selected platform; "(detected)" meant
+  // "somewhere" which misled multi-platform runs. Labels show on which platforms
+  // each server already exists and which still need onboarding.
+  const mcpPresence = detectMcpPresenceByPlatform(platforms);
+  const mcpLabels = MCP_SERVERS.map(s => mcpPickerLabel(s, platforms, mcpPresence));
 
   const selectedLabels = await picker({
     title: 'oh-my-colab setup (4/5)',
-    subtitle: 'MCP servers (Space to toggle, Enter when done)',
+    subtitle: platforms.length > 1
+      ? 'MCP (labels show which selected platforms already have each server)'
+      : 'MCP servers (Space to toggle, Enter when done)',
     options: mcpLabels,
     multiSelect: true,
     defaults: MCP_SERVERS
-      .filter(s => !existingMcp.has(s.name)) // Don't default to already installed
-      .slice(0, 3) // Still default to first 3 if they are new
-      .map(s => s.label)
+      .filter(s => mcpNeedsOnboardingOnSomePlatform(s.name, platforms, mcpPresence))
+      .slice(0, 3)
+      .map(s => mcpLabels[MCP_SERVERS.indexOf(s)])
   }) || [];
 
-  const selectedMcp = MCP_SERVERS.filter(s => {
-    const label = existingMcp.has(s.name) ? `${s.label} (detected)` : s.label;
-    return selectedLabels.includes(label);
-  });
+  const selectedMcp = MCP_SERVERS.filter((s, idx) => selectedLabels.includes(mcpLabels[idx]));
   const mcpKeys = {};
 
   for (const srv of selectedMcp) {
@@ -109,11 +108,16 @@ async function run() {
     hudStyle = 'Full (3 lines)';
   }
 
-  const [seedDomainTemplates] = await picker({
+  const contextSeedChoices = contextSeedChoiceRows(CWD);
+  const contextLabels = contextSeedChoices.map(c => c.label);
+  const [pickedContextLabel] = await picker({
     title: 'oh-my-colab setup — optional glossary',
-    subtitle: 'Seed CONTEXT templates into project root? (skipped if files already exist)',
-    options: ['Skip', 'CONTEXT.md only', 'CONTEXT.md + CONTEXT-MAP.md'],
-  }) || ['Skip'];
+    subtitle: 'CONTEXT templates — bracket text reflects files already in the project root',
+    options: contextLabels,
+  }) || [contextLabels[0]];
+  const _ctxPickIdx = contextLabels.indexOf(pickedContextLabel);
+  const seedDomainTemplates =
+    _ctxPickIdx >= 0 ? contextSeedChoices[_ctxPickIdx].value : 'Skip';
 
   // Install
   stdout.write('\x1B[2J\x1B[H  🧠 oh-my-colab — Installing...\n  ─────────────────────────────────────\n\n');
@@ -169,62 +173,142 @@ function tmpl(f)  { return fs.readFileSync(path.join(PKG_ROOT, 'templates', f), 
 function fill(t, vars) { return t.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] || `{{${k}}}`); }
 function write(p, c, mode) { mkdir(path.dirname(p)); fs.writeFileSync(p, c, mode); }
 
-function detectExistingMcp(platforms) {
-  const detected = new Set();
-  // Claude Code
-  if (platforms.includes('Claude Code')) {
-    try {
-      const list = execSync('claude mcp list', { stdio: 'pipe', encoding: 'utf8' });
-      if (!list.includes('No MCP servers configured')) {
-        MCP_SERVERS.forEach(s => {
-          if (list.toLowerCase().includes(s.name.toLowerCase())) detected.add(s.name);
-        });
+/** Single-select glossary step: stable `value` for genContextSeed; `label` shows on-disk truth. */
+function contextSeedChoiceRows(cwd) {
+  const ctxPath = path.join(cwd, 'CONTEXT.md');
+  const mapPath = path.join(cwd, 'CONTEXT-MAP.md');
+  const ctxExists = fs.existsSync(ctxPath);
+  const mapExists = fs.existsSync(mapPath);
+
+  const only = ctxExists
+    ? 'CONTEXT.md only [CONTEXT.md exists — skipped]'
+    : 'CONTEXT.md only';
+
+  let both = 'CONTEXT.md + CONTEXT-MAP.md';
+  if (ctxExists && mapExists) both += ' [both exist — skipped]';
+  else if (ctxExists) both += ' [CONTEXT.md exists — only CONTEXT-MAP filled if missing]';
+  else if (mapExists) both += ' [CONTEXT-MAP.md exists — only CONTEXT filled if missing]';
+
+  return [
+    { value: 'Skip', label: 'Skip' },
+    { value: 'CONTEXT.md only', label: only },
+    { value: 'CONTEXT.md + CONTEXT-MAP.md', label: both },
+  ];
+}
+
+function canonicalMcpKeys(mcpServersObj) {
+  const found = new Set();
+  if (!mcpServersObj || typeof mcpServersObj !== 'object') return found;
+  for (const k of Object.keys(mcpServersObj)) {
+    const low = k.toLowerCase();
+    const match = MCP_SERVERS.find(s => s.name === k || s.name === low);
+    if (match) found.add(match.name);
+  }
+  return found;
+}
+
+/** MCP server `name`s found for a single platform's config (Claude list, Cursor file, etc.). */
+function getMcpServersForPlatform(platform) {
+  const found = new Set();
+  switch (platform) {
+    case 'Claude Code':
+      try {
+        const list = execSync('claude mcp list', { stdio: 'pipe', encoding: 'utf8' });
+        if (!list.includes('No MCP servers configured')) {
+          MCP_SERVERS.forEach(s => {
+            if (list.toLowerCase().includes(s.name.toLowerCase())) found.add(s.name);
+          });
+        }
+      } catch { /* claude not installed or no list */ }
+      break;
+    case 'Cursor': {
+      const mcpPath = path.join(CWD, '.cursor', 'mcp.json');
+      if (fs.existsSync(mcpPath)) {
+        try {
+          const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
+          for (const n of canonicalMcpKeys(config.mcpServers)) found.add(n);
+        } catch {}
       }
-    } catch {}
+      break;
+    }
+    case 'Antigravity': {
+      const mcpPath = path.join(os.homedir(), '.gemini', 'antigravity', 'mcp_config.json');
+      if (fs.existsSync(mcpPath)) {
+        try {
+          const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
+          for (const n of canonicalMcpKeys(config.mcpServers)) found.add(n);
+        } catch {}
+      }
+      break;
+    }
+    case 'Gemini CLI': {
+      const settingsPath = path.join(os.homedir(), '.gemini', 'settings.json');
+      if (fs.existsSync(settingsPath)) {
+        try {
+          const config = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+          for (const n of canonicalMcpKeys(config.mcpServers)) found.add(n);
+        } catch {}
+      }
+      break;
+    }
+    case 'Codex CLI': {
+      const configPath = path.join(os.homedir(), '.codex', 'config.toml');
+      if (fs.existsSync(configPath)) {
+        try {
+          const content = fs.readFileSync(configPath, 'utf8');
+          MCP_SERVERS.forEach(s => {
+            if (content.includes(`[mcp_servers.${s.name}]`)) found.add(s.name);
+          });
+        } catch {}
+      }
+      break;
+    }
+    default:
+      break;
   }
-  // Cursor
-  if (platforms.includes('Cursor')) {
-    const mcpPath = path.join(CWD, '.cursor', 'mcp.json');
-    if (fs.existsSync(mcpPath)) {
-      try {
-        const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
-        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
-      } catch {}
+  return found;
+}
+
+/** @returns { Record<string, string[]> } serverName -> platform labels (sorted) where that server is configured */
+function detectMcpPresenceByPlatform(platforms) {
+  /** @type Record<string, string[]> */
+  const presence = {};
+  for (const p of platforms) {
+    for (const name of getMcpServersForPlatform(p)) {
+      if (!presence[name]) presence[name] = [];
+      presence[name].push(p);
     }
   }
-  // Antigravity
-  if (platforms.includes('Antigravity')) {
-    const mcpPath = path.join(os.homedir(), '.gemini', 'antigravity', 'mcp_config.json');
-    if (fs.existsSync(mcpPath)) {
-      try {
-        const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
-        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
-      } catch {}
-    }
+  for (const k of Object.keys(presence)) {
+    presence[k].sort((a, b) => platforms.indexOf(a) - platforms.indexOf(b));
   }
-  // Gemini CLI
-  if (platforms.includes('Gemini CLI')) {
-    const settingsPath = path.join(os.homedir(), '.gemini', 'settings.json');
-    if (fs.existsSync(settingsPath)) {
-      try {
-        const config = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
-      } catch {}
-    }
-  }
-  // Codex CLI
-  if (platforms.includes('Codex CLI')) {
-    const configPath = path.join(os.homedir(), '.codex', 'config.toml');
-    if (fs.existsSync(configPath)) {
-      try {
-        const content = fs.readFileSync(configPath, 'utf8');
-        MCP_SERVERS.forEach(s => {
-          if (content.includes(`[mcp_servers.${s.name}]`)) detected.add(s.name);
-        });
-      } catch {}
-    }
-  }
-  return detected;
+  return presence;
+}
+
+function shortPlatformLabel(p) {
+  const map = { 'Claude Code': 'Claude', 'Codex CLI': 'Codex', 'Gemini CLI': 'Gemini' };
+  return map[p] || p;
+}
+
+function mcpPickerLabel(srv, platforms, presence) {
+  const on = presence[srv.name] || [];
+  const base = srv.label;
+  if (on.length === 0) return base;
+  if (platforms.length === 1)
+    return `${base} [already on ${platforms[0]}]`;
+  const missing = platforms.filter(p => !on.includes(p));
+  if (missing.length === 0)
+    return `${base} [all selected platforms]`;
+  return `${base} [on ${on.map(shortPlatformLabel).join(', ')}; add ${missing.map(shortPlatformLabel).join(', ')}]`;
+}
+
+function mcpNeedsOnboardingOnSomePlatform(serverName, platforms, presence) {
+  const on = presence[serverName] || [];
+  return on.length < platforms.length;
+}
+
+function configuredMcpServersOnClaude() {
+  return getMcpServersForPlatform('Claude Code');
 }
 
 function initGlobal() {
@@ -292,7 +376,7 @@ function genContextSeed({ seedDomainTemplates }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.4.7', project_name: project.projectName,
+    version: '0.4.8', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -604,9 +688,9 @@ function writeCodex({ selectedMcp, mcpKeys }) {
 }
 
 function installMcp({ selectedMcp, mcpKeys }) {
-  const existing = detectExistingMcp(['Claude Code']);
+  const existingOnClaude = configuredMcpServersOnClaude();
   for (const srv of selectedMcp) {
-    if (existing.has(srv.name)) continue;
+    if (existingOnClaude.has(srv.name)) continue;
     try {
       let cmd = `claude mcp add --scope user ${srv.name}`;
       const keys = mcpKeys[srv.name];
