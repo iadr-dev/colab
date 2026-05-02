@@ -1,12 +1,13 @@
 ---
+name: ohc-review
 description: REVIEW workflow: spec compliance (pass 1) then code quality (pass 2)
 ---
 
-# /review — REVIEW Workflow
+# /ohc-review — REVIEW Workflow
 
 Usage:
-  /review            — review current branch diff
-  /review src/auth   — review specific file or directory
+  /ohc-review            — review current branch diff
+  /ohc-review src/auth   — review specific file or directory
 
 Steps:
 1. Pass 1: spec compliance — compare against .ohc/plans/ success criteria

@@ -1,8 +1,9 @@
 ---
+name: ohc-caveman
 description: Enter persistent compressed communication mode
 ---
 
-# /caveman
+# /ohc-caveman
 
 Activate `caveman` mode for this session.
 

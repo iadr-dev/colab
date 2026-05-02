@@ -1,9 +1,10 @@
 ---
+name: ohc-research
 description: Cross-session research cache. Inspect, search, prune, or verify cached library docs that the researcher agent fetched via Context7/Brave/GitHub.
 argument-hint: "list | show <lib> <topic> | search \"<query>\" | prune [--older-than N] | clear | verify <lib> <topic> [commit]"
 ---
 
-# /research — Research Cache
+# /ohc-research — Research Cache
 
 The researcher agent caches every external-doc fetch (Context7, Brave, GitHub) to
 `.ohc/research/` so future sessions don't re-fetch the same thing. This command
@@ -21,13 +22,13 @@ reminder listing every cached entry + freshness. The researcher agent MUST
 
 ## Usage
 ```
-/research list                                  List cached entries (newest first)
-/research show <library> <topic>                Print one entry
-/research search "<query>"                      Substring match across all entries
-/research prune                                 Remove entries past TTL (default 30d)
-/research prune --older-than 90                 Remove anything older than 90 days
-/research clear                                 Nuke the entire cache
-/research verify <library> <topic> [commit]     Stamp an entry as verified-working
+/ohc-research list                                  List cached entries (newest first)
+/ohc-research show <library> <topic>                Print one entry
+/ohc-research search "<query>"                      Substring match across all entries
+/ohc-research prune                                 Remove entries past TTL (default 30d)
+/ohc-research prune --older-than 90                 Remove anything older than 90 days
+/ohc-research clear                                 Nuke the entire cache
+/ohc-research verify <library> <topic> [commit]     Stamp an entry as verified-working
 ```
 
 ## Equivalent CLI

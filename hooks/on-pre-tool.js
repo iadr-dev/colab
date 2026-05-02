@@ -14,6 +14,7 @@
 const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { skillSkillMd } = require('./resolve-paths');
 
 const CWD = process.cwd();
 const OHC = path.join(CWD, '.ohc');
@@ -24,13 +25,13 @@ function readJson(p, fallback) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
 }
 function readSkillReminder(skill, reason) {
-  const skillPath = path.join(CWD, 'skills', skill, 'SKILL.md');
-  const content = read(skillPath);
+  const { abs, rel } = skillSkillMd(CWD, skill);
+  const content = read(abs);
   if (!content) return null;
   return `<system_reminder skill="${skill}">
 ${reason}
 ${content.split('\n').slice(0, 40).join('\n')}
-(Full instructions: skills/${skill}/SKILL.md)
+(Full instructions: ${rel})
 </system_reminder>`;
 }
 function activeSkillsPath() {

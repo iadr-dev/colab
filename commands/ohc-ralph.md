@@ -1,9 +1,10 @@
 ---
+name: ohc-ralph
 description: Activate ralph persistence mode — keep iterating until the task is done or max iterations reached
 argument-hint: "[task description or leave blank to resume active PRD]"
 ---
 
-# /ralph — Persistence Mode
+# /ohc-ralph — Persistence Mode
 
 Activate ralph: a PRD-driven persistence loop that keeps going until the goal is met or you're blocked N times in a row.
 

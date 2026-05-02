@@ -1,8 +1,9 @@
 ---
+name: ohc-build
 description: BUILD workflow: load plan → dispatch subagents → TDD enforcement → verify
 ---
 
-# /build — BUILD Workflow
+# /ohc-build — BUILD Workflow
 
 Requires: approved plan in .ohc/plans/
 
@@ -13,4 +14,4 @@ Steps:
 4. After each task: verifier agent confirms tests pass
 5. After all tasks: reviewer agent runs REVIEW workflow
 
-If no plan exists: "No plan in .ohc/plans/. Run /plan first."
+If no plan exists: "No plan in .ohc/plans/. Run /ohc-plan first."

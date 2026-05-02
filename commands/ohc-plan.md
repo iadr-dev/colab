@@ -1,10 +1,11 @@
 ---
+name: ohc-plan
 description: PLAN workflow: interview → brainstorm → write task plan to .ohc/plans/
 ---
 
-# /plan — PLAN Workflow
+# /ohc-plan — PLAN Workflow
 
-Usage: /plan [describe what you want to build]
+Usage: /ohc-plan [describe what you want to build]
 
 Steps:
 1. Run brainstorming skill — clarifying questions (max 5)

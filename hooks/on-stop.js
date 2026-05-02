@@ -57,8 +57,8 @@ ${lastText.slice(0, 300)}${lastText.length > 300 ? '...' : ''}
   // Retro prompt — only suggest once per session (guard with retro_done flag)
   const retroReminder = (durationMin >= 30 && !meta.retro_done)
     ? `\n\n<system_reminder retro_prompt="true">
-Session has run ${durationMin} minutes. Run /retro to capture learnings and update memory files.
-(This reminder will not repeat once /retro has run.)
+Session has run ${durationMin} minutes. Run /ohc-retro to capture learnings and update memory files.
+(This reminder will not repeat once /ohc-retro has run.)
 </system_reminder>`
     : '';
 

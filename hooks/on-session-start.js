@@ -89,7 +89,7 @@ Plan: ${wf.planPath || '.ohc/plans/'}
 
 if (parts.length === 0) {
   parts.push(`<ohc_first_run>
-No ohc state found. Run /setup or \`ohc setup\` to initialize oh-my-colab.
+No ohc state found. Run /ohc-setup or \`ohc setup\` to initialize oh-my-colab.
 </ohc_first_run>`);
 }
 

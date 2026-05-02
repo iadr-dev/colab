@@ -125,5 +125,5 @@ console.log(`## Tech Stack (auto-detected)
 | Monorepo tool | ${monorepo} |
 | CI | ${ci} |
 
-> Run /explore to populate architecture and conventions sections.
+> Run /ohc-explore to populate architecture and conventions sections.
 `);
