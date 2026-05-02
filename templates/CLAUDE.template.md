@@ -44,34 +44,34 @@ Haiku for researcher/writer only. Sonnet for all others.
 <ohc_workflows>
 
 ## EXPLORE
-Trigger: keyword "explore" | /explore | new project or feature area
+Trigger: keyword "explore" | /ohc-explore | new project or feature area
 Chain: explore-codebase skill → generate-project-map.py → populate .ohc/PROJECT.md
 Output: updated PROJECT.md with stack, architecture, conventions, entry points
 
 ## PLAN
-Trigger: keyword "plan" | /plan | task >30min
+Trigger: keyword "plan" | /ohc-plan | task >30min
 Chain: brainstorming skill → writing-plans skill → save to .ohc/plans/{name}.md
 Gate: show plan to user and await explicit "go" — do NOT hand to BUILD without confirmation
 
 ## BUILD
-Trigger: keyword "build" | /build | confirmed plan exists
+Trigger: keyword "build" | /ohc-build | confirmed plan exists
 Chain: load-plan → subagent-driven-development skill → test-driven-development skill → verifier agent
 Each task: dispatch executor → verifier checks → loop until 0 failing 0 skipped
 
 ## REVIEW
-Trigger: keyword "review" | /review | BUILD completes
+Trigger: keyword "review" | /ohc-review | BUILD completes
 Chain: requesting-code-review skill (spec pass) → security scan → quality pass → apply fixes
 Pass 1 — Spec compliance: does code do what was asked?
 Pass 2 — Code quality: naming, complexity, coverage, security
 Output: ✓/⚠/✗ report. ✗ items block ship.
 
 ## SHIP
-Trigger: keyword "ship" | /ship | REVIEW passes
+Trigger: keyword "ship" | /ohc-ship | REVIEW passes
 Chain: finishing-a-branch skill → changelog-entry → pr-description → clean-worktrees
 Gate: run pre-merge-check.sh first. Non-zero exit = do not proceed.
 
 ## RETRO
-Trigger: keyword "retro" | /retro | auto-prompt after session >30min
+Trigger: keyword "retro" | /ohc-retro | auto-prompt after session >30min
 Chain: session-diff → extract-patterns.py → update USER.md → update PROJECT.md → draft skill?
 Output: updated memory files, optional .ohc/skills/ draft
 </ohc_workflows>

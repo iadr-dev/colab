@@ -22,6 +22,7 @@ Ask questions that reveal hidden requirements or constraints:
 
 If the user uses project-specific terms, check `.ohc/PROJECT.md` first. Also
 read optional domain docs (`CONTEXT.md` / `CONTEXT-MAP.md`) when present.
+If they attach **outside** authoritative docs in non-OHC layouts, run **`document-intake`** so naming aligns with glossary rules in `skills/writing-plans/references/domain-docs.md`. For greenfield framing, optionally use `references/product-brief-template.md`.
 Sharpen overloaded terms before designing.
 
 Stop when you understand the problem well enough to design for it.

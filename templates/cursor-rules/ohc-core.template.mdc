@@ -18,8 +18,8 @@ Greet user: current task + git branch + plan progress.
 - "ship"      → SHIP: pre-merge check → changelog → PR → clean
 - "retro"     → RETRO: session diff → learnings → update memory files
 - "autopilot" → PLAN + BUILD + REVIEW chained, pause at plan for human OK
-- "team"      → /team N:provider "task" — parallel workers, RESULT.json gate, auto fix loop
-- "research"  → /research list|show|search — cross-session Context7/Brave doc cache
+- "team"      → /ohc-team N:provider "task" — parallel workers, RESULT.json gate, auto fix loop
+- "research"  → /ohc-research list|show|search — cross-session Context7/Brave doc cache
 
 ## Discipline Rules
 - No code for tasks >30min without a plan in .ohc/plans/

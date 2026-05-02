@@ -29,7 +29,7 @@ Context7/Brave/GitHub doc fetches persist to .ohc/research/<library>--<topic>.md
 - Default TTL 30d; stale entries are pruned at session end.
 
 ## Team Artifacts (parallel workers)
-When running as a `/team` worker, DO NOT append to .ohc/notepad.md directly —
+When running as a `/ohc-team` worker, DO NOT append to .ohc/notepad.md directly —
 concurrent writes race. Instead:
 - Per-worker notes: .ohc/state/team/<id>/workers/<name>/notes.md
 - Structured result: .ohc/state/team/<id>/workers/<name>/RESULT.json

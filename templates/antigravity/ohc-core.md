@@ -17,8 +17,8 @@ Greet user: one-line status — current task + branch + plan progress.
 - "ship it"   → SHIP: pre-merge check → changelog → PR description → clean
 - "retro"     → RETRO: session diff → learnings → update memory files
 - "autopilot" → PLAN + BUILD + REVIEW, pause at plan for human OK
-- "team"      → /team N:provider "task" — spawn parallel workers with RESULT.json gate
-- "research"  → /research list|show|search — cross-session Context7/Brave doc cache
+- "team"      → /ohc-team N:provider "task" — spawn parallel workers with RESULT.json gate
+- "research"  → /ohc-research list|show|search — cross-session Context7/Brave doc cache
 
 ## Core Rules
 - Never write code for tasks >30 minutes without an approved plan in .ohc/plans/
