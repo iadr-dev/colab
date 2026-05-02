@@ -57,16 +57,26 @@ async function run() {
   }) || ['Autopilot (plan + build + review)'];
 
   // Screen 4: MCP servers
-  const mcpLabels = MCP_SERVERS.map(s => s.label);
+  const existingMcp = detectExistingMcp(platforms);
+  const mcpLabels = MCP_SERVERS.map(s => {
+    return existingMcp.has(s.name) ? `${s.label} (detected)` : s.label;
+  });
+
   const selectedLabels = await picker({
     title: 'oh-my-colab setup (4/5)',
     subtitle: 'MCP servers (Space to toggle, Enter when done)',
     options: mcpLabels,
     multiSelect: true,
-    defaults: [MCP_SERVERS[0].label, MCP_SERVERS[1].label, MCP_SERVERS[2].label]
+    defaults: MCP_SERVERS
+      .filter(s => !existingMcp.has(s.name)) // Don't default to already installed
+      .slice(0, 3) // Still default to first 3 if they are new
+      .map(s => s.label)
   }) || [];
 
-  const selectedMcp = MCP_SERVERS.filter(s => selectedLabels.includes(s.label));
+  const selectedMcp = MCP_SERVERS.filter(s => {
+    const label = existingMcp.has(s.name) ? `${s.label} (detected)` : s.label;
+    return selectedLabels.includes(label);
+  });
   const mcpKeys = {};
 
   for (const srv of selectedMcp) {
@@ -99,10 +109,16 @@ async function run() {
     hudStyle = 'Full (3 lines)';
   }
 
+  const [seedDomainTemplates] = await picker({
+    title: 'oh-my-colab setup — optional glossary',
+    subtitle: 'Seed CONTEXT templates into project root? (skipped if files already exist)',
+    options: ['Skip', 'CONTEXT.md only', 'CONTEXT.md + CONTEXT-MAP.md'],
+  }) || ['Skip'];
+
   // Install
   stdout.write('\x1B[2J\x1B[H  🧠 oh-my-colab — Installing...\n  ─────────────────────────────────────\n\n');
 
-  const config = { platforms, teamMode, workflow, selectedMcp, mcpKeys, hudStyle, project };
+  const config = { platforms, teamMode, workflow, selectedMcp, mcpKeys, hudStyle, project, seedDomainTemplates };
 
   const steps = [
     ['~/.ohc/ global dirs',           () => initGlobal()],
@@ -110,6 +126,7 @@ async function run() {
     ['SOUL.md',                        () => genSoul()],
     ['USER.md',                        () => genUser(config)],
     ['PROJECT.md',                     () => genProject(config)],
+    ['CONTEXT templates',              () => genContextSeed(config)],
     (platforms.includes('Claude Code') || platforms.includes('Codex CLI') || platforms.includes('Cursor'))
                                        ? ['AGENTS.md / CLAUDE.md',          () => genAgents(config)] : null,
     platforms.includes('Claude Code')  ? ['~/.claude/settings.json',        () => genSettings(config)] : null,
@@ -117,7 +134,7 @@ async function run() {
     platforms.includes('Cursor')       ? ['.cursor/rules+mcp (+ .claude/ compat)', () => writeCursor(config)] : null,
     platforms.includes('Antigravity')  ? ['.agents/ + scripts + global mcp_config.json', () => writeAntigravity(config)] : null,
     platforms.includes('Gemini CLI')   ? ['GEMINI.md + ~/.gemini/settings.json', () => writeGemini(config)] : null,
-    platforms.includes('Codex CLI')    ? ['~/.codex/ prompts + config.toml', () => writeCodex(config)] : null,
+    platforms.includes('Codex CLI')    ? ['~/.codex/ + .agents/skills + config.toml', () => writeCodex(config)] : null,
     platforms.includes('Claude Code')  ? ['MCP servers via claude mcp add', () => installMcp(config)] : null,
     hudStyle !== 'None'                ? ['HUD status bar',            () => writeHud(config)] : null,
     ['~/.ohc/config.json',             () => writeConfig(config)],
@@ -141,8 +158,8 @@ async function run() {
   }
 
   console.log('  Next steps:');
-  stdout.write('    1. Run /explore to understand this codebase\n');
-  stdout.write('    2. Run /plan to start building something\n');
+  stdout.write('    1. Run /ohc-explore to understand this codebase\n');
+  stdout.write('    2. Run /ohc-plan to start building something\n');
   stdout.write('    3. Type "autopilot" to let oh-my-colab drive\n\n');
 }
 
@@ -151,6 +168,64 @@ function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
 function tmpl(f)  { return fs.readFileSync(path.join(PKG_ROOT, 'templates', f), 'utf8'); }
 function fill(t, vars) { return t.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] || `{{${k}}}`); }
 function write(p, c, mode) { mkdir(path.dirname(p)); fs.writeFileSync(p, c, mode); }
+
+function detectExistingMcp(platforms) {
+  const detected = new Set();
+  // Claude Code
+  if (platforms.includes('Claude Code')) {
+    try {
+      const list = execSync('claude mcp list', { stdio: 'pipe', encoding: 'utf8' });
+      if (!list.includes('No MCP servers configured')) {
+        MCP_SERVERS.forEach(s => {
+          if (list.toLowerCase().includes(s.name.toLowerCase())) detected.add(s.name);
+        });
+      }
+    } catch {}
+  }
+  // Cursor
+  if (platforms.includes('Cursor')) {
+    const mcpPath = path.join(CWD, '.cursor', 'mcp.json');
+    if (fs.existsSync(mcpPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
+        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
+      } catch {}
+    }
+  }
+  // Antigravity
+  if (platforms.includes('Antigravity')) {
+    const mcpPath = path.join(os.homedir(), '.gemini', 'antigravity', 'mcp_config.json');
+    if (fs.existsSync(mcpPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(mcpPath, 'utf8'));
+        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
+      } catch {}
+    }
+  }
+  // Gemini CLI
+  if (platforms.includes('Gemini CLI')) {
+    const settingsPath = path.join(os.homedir(), '.gemini', 'settings.json');
+    if (fs.existsSync(settingsPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+        if (config.mcpServers) Object.keys(config.mcpServers).forEach(name => detected.add(name));
+      } catch {}
+    }
+  }
+  // Codex CLI
+  if (platforms.includes('Codex CLI')) {
+    const configPath = path.join(os.homedir(), '.codex', 'config.toml');
+    if (fs.existsSync(configPath)) {
+      try {
+        const content = fs.readFileSync(configPath, 'utf8');
+        MCP_SERVERS.forEach(s => {
+          if (content.includes(`[mcp_servers.${s.name}]`)) detected.add(s.name);
+        });
+      } catch {}
+    }
+  }
+  return detected;
+}
 
 function initGlobal() {
   ['skills','sessions','hud'].forEach(d => mkdir(path.join(os.homedir(), '.ohc', d)));
@@ -161,7 +236,7 @@ function initProject() {
     mkdir(path.join(CWD, '.ohc', d))
   );
   const n = path.join(CWD, '.ohc', 'notepad.md');
-  if (!fs.existsSync(n)) write(n, `# Working Notes\n\n## Current Task\n(none)\n\n## What's Done\n\n## Blockers\n(none)\n\n## Noticed (not in scope)\n\n## Next Steps\nRun /explore to understand this codebase.\n`);
+  if (!fs.existsSync(n)) write(n, `# Working Notes\n\n## Current Task\n(none)\n\n## What's Done\n\n## Blockers\n(none)\n\n## Noticed (not in scope)\n\n## Next Steps\nRun /ohc-explore to understand this codebase.\n`);
   const m = path.join(CWD, '.ohc', 'project-memory.json');
   if (!fs.existsSync(m)) write(m, JSON.stringify({ tech_stack:{}, conventions:[], known_gotchas:[], learned:[] }, null, 2));
 }
@@ -193,12 +268,25 @@ function genProject({ project }) {
     ci_provider: project.ci, database: 'unknown',
     main_entry: project.mainEntry, test_directory: project.testDirectory,
     config_files: 'package.json, tsconfig.json', api_entry: 'src/api/',
-    architecture_summary: 'Run /explore to generate architecture summary.',
+    architecture_summary: 'Run /ohc-explore to generate architecture summary.',
     naming_convention: 'camelCase (functions/vars), PascalCase (classes)',
     file_structure_pattern: 'feature-based', import_style: 'ES modules',
     error_handling_pattern: 'throw Error, try/catch at boundaries',
     github_repo: project.gitRemote, linear_project: '', figma_file: ''
   }));
+}
+
+function genContextSeed({ seedDomainTemplates }) {
+  const choice = seedDomainTemplates || 'Skip';
+  if (choice === 'Skip') return;
+  const ctx = path.join(CWD, 'CONTEXT.md');
+  const mapPath = path.join(CWD, 'CONTEXT-MAP.md');
+  if (choice === 'CONTEXT.md only' || choice === 'CONTEXT.md + CONTEXT-MAP.md') {
+    if (!fs.existsSync(ctx)) write(ctx, tmpl('CONTEXT.template.md'));
+  }
+  if (choice === 'CONTEXT.md + CONTEXT-MAP.md') {
+    if (!fs.existsSync(mapPath)) write(mapPath, tmpl('CONTEXT-MAP.template.md'));
+  }
 }
 
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
@@ -246,8 +334,18 @@ function genSettings({ teamMode, hudStyle }) {
       }
     } : {})
   }, null, 2));
+
+  // Project-scoped permissions for seamless workflow
+  const mcpAllow = MCP_SERVERS.map(s => `mcp__${s.name}`);
+  const allow = [
+    'Bash', 'Read', 'Write', 'Edit', 'MultiEdit', 'WebFetch',
+    'Grep', 'Glob', // Built-in search tools
+    'Agent(Explore)', 'Agent(Plan)',
+    ...mcpAllow
+  ];
+
   write(path.join(CWD, '.claude', 'settings.json'),
-    JSON.stringify({ permissions: { allow: ['Bash','Read','Write','Edit','MultiEdit'] } }, null, 2));
+    JSON.stringify({ permissions: { allow } }, null, 2));
 }
 
 function copyDir(src, dst) {
@@ -370,7 +468,7 @@ function writeAntigravity({ selectedMcp, mcpKeys }) {
 
   const commandsDir = path.join(PKG_ROOT, 'commands');
   for (const f of fs.readdirSync(commandsDir)) {
-    if (f === 'setup.md') continue;
+    if (f === 'ohc-setup.md') continue;
     const src = path.join(commandsDir, f);
     const name = path.basename(f, '.md');
     if (fs.existsSync(src)) {
@@ -398,8 +496,9 @@ function writeAntigravity({ selectedMcp, mcpKeys }) {
     const env = {};
     const keys = mcpKeys[srv.name];
     if (keys) for (const [k, v] of Object.entries(keys)) env[k] = v;
+    // Antigravity expects streamable HTTP as `serverUrl`, not `url` (see https://antigravity.google/docs/mcp).
     if (srv.url) {
-      mcpServers[srv.name] = { url: srv.url, env };
+      mcpServers[srv.name] = { serverUrl: srv.url, env };
     } else {
       const args = [...srv.args];
       if (srv.name === 'context7' && keys?.CONTEXT7_API_KEY) args.push('--api-key', keys.CONTEXT7_API_KEY);
@@ -455,9 +554,18 @@ function writeGemini({ project, selectedMcp, mcpKeys }) {
 function writeCodex({ selectedMcp, mcpKeys }) {
   // Codex CLI reads AGENTS.md at the project root — produced by genAgents().
   // User-scope prompts dir (custom slash commands) and MCP config live under ~/.codex/.
+  // Official skills discovery: $REPO_ROOT/.agents/skills (see OpenAI Codex skills docs).
   const codexHome    = path.join(os.homedir(), '.codex');
   const promptsDir   = path.join(codexHome, 'prompts');
   mkdir(codexHome); mkdir(promptsDir);
+
+  const agentsSkills = path.join(CWD, '.agents', 'skills');
+  mkdir(path.join(CWD, '.agents'));
+  mkdir(agentsSkills);
+  for (const skill of fs.readdirSync(path.join(PKG_ROOT, 'skills'))) {
+    const src = path.join(PKG_ROOT, 'skills', skill);
+    if (fs.statSync(src).isDirectory()) copyDir(src, path.join(agentsSkills, skill));
+  }
 
   // Expose OHC commands as Codex prompts (~/.codex/prompts/<name>.md)
   for (const f of fs.readdirSync(path.join(PKG_ROOT, 'commands'))) {
@@ -496,7 +604,9 @@ function writeCodex({ selectedMcp, mcpKeys }) {
 }
 
 function installMcp({ selectedMcp, mcpKeys }) {
+  const existing = detectExistingMcp(['Claude Code']);
   for (const srv of selectedMcp) {
+    if (existing.has(srv.name)) continue;
     try {
       let cmd = `claude mcp add --scope user ${srv.name}`;
       const keys = mcpKeys[srv.name];

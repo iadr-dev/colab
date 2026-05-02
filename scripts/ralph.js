@@ -6,7 +6,7 @@
  *
  * Used by:
  *   - on-stop.js (check if ralph is active → inject continuation)
- *   - commands/ralph.md (describes the protocol)
+ *   - commands/ohc-ralph.md (describes the protocol)
  *   - ohc CLI: ohc ralph status | activate | deactivate | advance | reset
  */
 

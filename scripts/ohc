@@ -9,6 +9,7 @@ const [,, cmd, ...args] = process.argv;
 
 const COMMANDS = {
   setup:    'Interactive onboarding',
+  doctor:   'Health check (.ohc, hooks, MCP env hints)',
   team:     'Spawn N parallel agents: ohc team N:provider "task"',
   parallel: 'Alias for ohc team',
   skill:    'Manage skills: ohc skill list | promote <n> | draft <n>',
@@ -33,6 +34,7 @@ if (cmd === 'version' || cmd === '--version') {
 
 const routes = {
   setup:    () => require(path.join(PKG_ROOT, 'scripts/setup/index.js'))(),
+  doctor:   () => require(path.join(PKG_ROOT, 'scripts/doctor.js'))(),
   team:     () => require(path.join(PKG_ROOT, 'scripts/team/index.js'))(args),
   parallel: () => require(path.join(PKG_ROOT, 'scripts/team/index.js'))(args),
   skill:    () => require(path.join(PKG_ROOT, 'scripts/skill.js'))(args),
