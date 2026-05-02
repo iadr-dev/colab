@@ -10,6 +10,19 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.8] — 2026-05-02
+
+### Fixed
+
+- **`ohc setup` MCP step**: Per-platform detection so multi-platform runs no longer label a server as fully present when it only exists on a subset of selected tools (picker shows where each MCP is configured; defaults favor servers still missing somewhere).
+- **`claude mcp add`**: Skips only when the server already exists under **Claude Code**, not when present only under Cursor/Codex/Gemini/Antigravity.
+
+### Changed
+
+- **CONTEXT glossary step**: Options show whether `CONTEXT.md` / `CONTEXT-MAP.md` already exist so “skip existing” behavior is visible before confirming.
+
+---
+
 ## [0.4.7] — 2026-05-02
 
 ### Added
@@ -256,7 +269,9 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.6...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.8...HEAD
+[0.4.8]: https://github.com/iadr-dev/colab/compare/v0.4.7...v0.4.8
+[0.4.7]: https://github.com/iadr-dev/colab/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/iadr-dev/colab/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/iadr-dev/colab/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/iadr-dev/colab/compare/v0.4.3...v0.4.4
