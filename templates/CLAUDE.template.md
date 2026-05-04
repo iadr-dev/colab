@@ -36,9 +36,11 @@ Route tasks to agents by type. Model assignment is fixed — do not override.
 | researcher  | claude-haiku-4-5   | Context7 + Brave Search, live docs           |
 | writer      | claude-haiku-4-5   | Changelogs, PR descriptions, docs            |
 | collaborator| claude-opus-4-7    | Team handoffs, update notepad.md             |
+| librarian   | claude-haiku-4-5   | Context efficiency, large file summarization |
+| advisor     | claude-opus-4-7    | Proactive risk assessment, gap analysis      |
 
-Model routing rule: opus for planner/reviewer/architect/collaborator only.
-Haiku for researcher/writer only. Sonnet for all others.
+Model routing rule: opus for planner/reviewer/architect/collaborator/advisor only.
+Haiku for researcher/writer/librarian only. Sonnet for all others.
 </ohc_agent_catalog>
 
 <ohc_workflows>
@@ -47,6 +49,11 @@ Haiku for researcher/writer only. Sonnet for all others.
 Trigger: keyword "explore" | /ohc-explore | new project or feature area
 Chain: explore-codebase skill → generate-project-map.py → populate .ohc/PROJECT.md
 Output: updated PROJECT.md with stack, architecture, conventions, entry points
+
+### Deep Search mode
+Trigger: keyword "deepsearch" | "deep search" | "search codebase"
+Same skill (explore-codebase) but in targeted mode: grep for patterns, trace data flows,
+map dependencies for a specific concept — rather than the full Round 1-4 structural scan.
 
 ## PLAN
 Trigger: keyword "plan" | /ohc-plan | task >30min

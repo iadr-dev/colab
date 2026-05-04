@@ -14,15 +14,15 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 
 ## Why oh-my-colab?
 
-| Problem                                               | Solution                                                              |
-| ----------------------------------------------------- | --------------------------------------------------------------------- |
-| Goldfish brain — forgets everything between sessions  | 4-layer memory: SOUL + USER + PROJECT + notepad                       |
-| Re-fetches the same library docs every session        | Cross-session research cache (`.ohc/research/`) — lookup before fetch |
-| Jumps to code without planning                        | Enforced PLAN gate for tasks >30 minutes                              |
-| "Done" without running tests                          | Verifier agent reads actual output — 0 failing, 0 skipped             |
-| Only works with one platform                          | 5 platforms: Claude Code, Cursor, Antigravity, Codex, Gemini          |
-| Parallel agents can't coordinate or verify each other | `/ohc-team` five-stage pipeline with `RESULT.json` gate + auto fix loop   |
-| No learning loop                                      | RETRO extracts skills from every session                              |
+| Problem                                               | Solution                                                                |
+| ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| Goldfish brain — forgets everything between sessions  | 4-layer memory: SOUL + USER + PROJECT + notepad                         |
+| Re-fetches the same library docs every session        | Cross-session research cache (`.ohc/research/`) — lookup before fetch   |
+| Jumps to code without planning                        | Enforced PLAN gate for tasks >30 minutes                                |
+| "Done" without running tests                          | Verifier agent reads actual output — 0 failing, 0 skipped               |
+| Only works with one platform                          | 5 platforms: Claude Code, Cursor, Antigravity, Codex, Gemini            |
+| Parallel agents can't coordinate or verify each other | `/ohc-team` five-stage pipeline with `RESULT.json` gate + auto fix loop |
+| No learning loop                                      | RETRO extracts skills from every session                                |
 
 ---
 
@@ -41,15 +41,15 @@ ohc setup
 
 Bundled manifests live under **[`.claude-plugin/`](.claude-plugin/)** (metadata only). Ships **`skills/`**, **`agents/`**, plugin hooks (**[`hooks/plugin-hooks.json`](hooks/plugin-hooks.json)** with **`${CLAUDE_PLUGIN_ROOT}`** per [plugins reference](https://docs.claude.com/en/docs/claude-code/plugins-reference)), and Claude slash definitions as **`commands/ohc-*.md`** (Workflows section lists them). **`ohc setup`** copies the verbose **[`hooks/hooks.json`](hooks/hooks.json)** into `.claude/hooks/` when you onboard a project workspace (and mirrors commands into `.claude/commands/`).
 
-Develop from this repo:
+Develop from this repo for claude code:
 
 ```bash
 /plugin marketplace add ./.claude-plugin/marketplace.json
 /plugin install oh-my-colab --scope project
 ```
 
+Or from local directory installed once:
 Use **`npm i -g @iadr-dev/colab && ohc setup`** when you want the full multi-platform scaffold (recommended together with or after the Claude plugin).
-
 
 ---
 
@@ -68,27 +68,36 @@ Paths are created by **`ohc setup`** (`PROJECT.md` / `notepad.md` under `.ohc/` 
 
 **You can edit `.ohc/notepad.md` directly between sessions.** Write for your future self or teammate. The agent picks up exactly where you left off.
 
+### 12-hook event system
+
+oh-my-colab intercepts **12 Claude Code lifecycle events** (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `SubagentStart`, `SubagentStop`, `PreCompact`, `PostCompact`, `Stop`, `SessionEnd`, `PermissionRequest`). Each hook runs a Node.js handler under **`hooks/`** that can inject `<system_reminder>` context, persist state, and enforce workflows. Plugin installs use **`hooks/plugin-hooks.json`** (with `${CLAUDE_PLUGIN_ROOT}` paths); `ohc setup` copies **`hooks/hooks.json`** (verbose format) into `.claude/`.
+
 ---
 
 ## Workflows — keyword-triggered
 
 Core six:
 
-| Keyword       | Workflow    | What happens                                                  |
-| ------------- | ----------- | ------------------------------------------------------------- |
-| `"explore"`   | **EXPLORE** | Reads codebase, populates `.ohc/PROJECT.md`                        |
-| `"plan this"` | **PLAN**    | Interview → approaches → task list → confirms before building (`"design this"` routes here too — see **`hooks/keyword-map.json`**) |
-| `"build"`     | **BUILD**   | Loads plan → subagents → TDD → verifier (`"implement"` synonyms in keyword map) |
-| `"review"`    | **REVIEW**  | Spec compliance + code quality report                         |
-| `"ship it"`   | **SHIP**    | Pre-merge check → changelog → PR → clean                      |
-| `"retro"`     | **RETRO**   | Session diff → patterns → update memory files                 |
+| Keyword        | Workflow    | What happens                                                                                                                       |
+| -------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `"explore"`    | **EXPLORE** | Reads codebase, populates `.ohc/PROJECT.md`                                                                                        |
+| `"deepsearch"` | **EXPLORE** | Targeted deep search — grep patterns, trace data flows, map dependencies for a specific concept (deep mode of explore)             |
+| `"plan this"`  | **PLAN**    | Interview → approaches → task list → confirms before building (`"design this"` routes here too — see **`hooks/keyword-map.json`**) |
+| `"build"`      | **BUILD**   | Loads plan → subagents → TDD → verifier (`"implement"` synonyms in keyword map)                                                    |
+| `"review"`     | **REVIEW**  | Spec compliance + code quality report                                                                                              |
+| `"ship it"`    | **SHIP**    | Pre-merge check → changelog → PR → clean                                                                                           |
+| `"retro"`      | **RETRO**   | Session diff → patterns → update memory files                                                                                      |
 
 Meta-workflows:
 
-| Keyword       | Workflow      | What happens                                           |
-| ------------- | ------------- | ------------------------------------------------------ |
-| `"autopilot"` | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK (`"full auto"` skips that gate) |
-| `"ralph"`     | **RALPH**     | BUILD with persistence until tests pass (or max iters); **`/ohc-ralph`** maps in **`hooks/keyword-map.json`** |
+| Keyword        | Workflow      | What happens                                                                                                  |
+| -------------- | ------------- | ------------------------------------------------------------------------------------------------------------- |
+| `"autopilot"`  | **AUTOPILOT** | PLAN + BUILD + REVIEW chained, pauses at plan for OK (`"full auto"` skips that gate)                          |
+| `"ultrawork"`  | **ULTRAWORK** | PLAN + BUILD + REVIEW chained in parallel mode for maximum throughput                                         |
+| `"ralph"`      | **RALPH**     | BUILD with persistence until tests pass (or max iters); **`/ohc-ralph`** maps in **`hooks/keyword-map.json`** |
+| `"ralplan"`    | **PLAN**      | PLAN with persistence and iterative refinement                                                                |
+| `"ultrathink"` | **THINK**     | Extended brainstorming with deep reasoning and rigorous clarification rubrics                                 |
+| `"stopomc"`    | **STOP**      | Deactivates all persistent modes (bulk mode off, `"stop all"` also works)                                     |
 
 Keyword routing is authoritative; edits go in **`hooks/keyword-map.json`** (picked up by **`hooks/on-user-prompt.js`**).
 
@@ -102,21 +111,23 @@ Each workflow row above aligns with keywords; these slashes are explicit equival
 
 ---
 
-## Nine agents
+## Eleven agents
 
-Definitions live in **`agents/*.md`** (nine files). Routed on Claude Code with the models below:
+Definitions live in **`agents/*.md`** (eleven files). Routed on Claude Code with the models below:
 
-| Agent        | Model  | Role                                     |
-| ------------ | ------ | ---------------------------------------- |
-| planner      | opus   | Requirements, design, task decomposition |
-| executor     | sonnet | Code writing, plan implementation        |
-| reviewer     | opus   | Code review, spec compliance, security   |
-| verifier     | sonnet | Test execution — reads actual output     |
-| debugger     | sonnet | Hypothesis-driven root cause             |
-| architect    | opus   | System design, ADRs                      |
-| researcher   | haiku  | Context7 docs, Brave Search              |
-| writer       | haiku  | Changelogs, PR descriptions              |
-| collaborator | sonnet | Team handoffs, notepad updates           |
+| Agent        | Model  | Role                                         |
+| ------------ | ------ | -------------------------------------------- |
+| planner      | opus   | Requirements, design, task decomposition     |
+| executor     | sonnet | Code writing, plan implementation            |
+| reviewer     | opus   | Code review, spec compliance, security       |
+| verifier     | sonnet | Test execution — reads actual output         |
+| debugger     | sonnet | Hypothesis-driven root cause                 |
+| architect    | opus   | System design, ADRs                          |
+| researcher   | haiku  | Context7 docs, Brave Search                  |
+| writer       | haiku  | Changelogs, PR descriptions                  |
+| collaborator | opus   | Team handoffs, notepad updates               |
+| librarian    | opus   | Context efficiency, large file summarization |
+| advisor      | opus   | Proactive risk assessment, gap analysis      |
 
 The `Model` column is the Claude Code subagent model routing and applies only on Claude Code. On other platforms the agent `.md` files are rule/role references — the host platform decides which model runs. **`hooks/keyword-map.json`** also maps **"handoff"** / **"picking up"** phrases to the **collaborator** agent.
 
@@ -166,24 +177,24 @@ ohc team list                         # List all active teams
 
 "Trigger" is how the skill gets loaded: keyword phrases are matched by `hooks/on-user-prompt.js` against `hooks/keyword-map.json`; "referenced" skills are loaded by another skill or workflow.
 
-| Skill                           | Trigger                                | Enforces                                                                           |
-| ------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| **ohc-coding-discipline**       | **`CLAUDE.md` / Cursor rules norms** + keywords **`"discipline"`**, **`"scope check"`** | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria |
-| **explore-codebase**            | `"explore"`, `"explore codebase"`, `"understand"` | Reading order, `.ohc/PROJECT.md` population                                               |
-| **brainstorming**               | referenced by writing-plans            | Socratic questioning; `references/product-brief-template.md` for greenfield framing |
-| **writing-plans**               | `"plan this"`; substring **`plan `**; **`write a plan`** | ≤2h tasks, confirmation gate before BUILD                                          |
-| **autopilot**                   | `"autopilot"`, `"auto pilot"`, `"full auto"`; **`/ohc-autopilot`** | PLAN → BUILD → REVIEW chain (**`full auto`** skips plan gate in keyword map)     |
-| **document-intake**             | `"from my docs"`, `"existing spec"`, `"external spec"`, **`"document intake"`**, **`/ohc-document-intake`** | Respect third-party PRD/RFC layouts; emit `.ohc/doc-sources.md` + traced `.ohc/plans/` |
-| **test-driven-development**     | `"tdd"`, `"test first"`                | RED-GREEN-REFACTOR, 0 failing 0 skipped                                            |
-| **subagent-driven-development** | referenced by BUILD workflow           | Git worktrees, dispatch protocol                                                   |
-| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"`, **`"why is"`** | Hypothesis before fix                                                              |
-| **requesting-code-review**      | `"review"`, `"code review"`, **`"check this"`** | Two-pass: spec then quality                                                        |
-| **finishing-a-branch**          | `"ship"`, `"ship it"`, **`"finish branch"`** | Pre-merge check, changelog, PR, cleanup + optional **`references/production-checklist.md`** |
-| **retrospective**               | `"retro"`, `"retrospective"`           | Session diff, pattern extraction, memory update                                    |
-| **context7-aware-coding**       | referenced when using libs             | Live docs via Context7 — cache-first via `.ohc/research/`, no guessing             |
-| **writing-skills**              | reference doc (meta)                   | Skill authoring guide and structure                                                |
-| **ralph**                       | `"ralph"`, `"keep going"`, `"ralph mode"`, **`/ohc-ralph`** | Persistent BUILD until tests pass                                                  |
-| **caveman**                     | **`"stop caveman"`** / **`"normal mode"`** (exit); **`"caveman mode"`**, **`"compressed mode"`** (enter) | Persistent compressed responses with technical accuracy                            |
+| Skill                           | Trigger                                                                                                     | Enforces                                                                                    |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **ohc-coding-discipline**       | **`CLAUDE.md` / Cursor rules norms** + keywords **`"discipline"`**, **`"scope check"`**                     | Minimal scope, surgical changes, explicit assumptions, verifiable success criteria          |
+| **explore-codebase**            | `"explore"`, `"explore codebase"`, `"understand"`, `"deepsearch"`, `"deep search"`                          | Reading order, `.ohc/PROJECT.md` population; **deep mode**: targeted pattern/flow search    |
+| **brainstorming**               | referenced by writing-plans                                                                                 | Socratic questioning; `references/product-brief-template.md` for greenfield framing         |
+| **writing-plans**               | `"plan this"`; substring **`plan `**; **`write a plan`**                                                    | ≤2h tasks, confirmation gate before BUILD                                                   |
+| **autopilot**                   | `"autopilot"`, `"auto pilot"`, `"full auto"`; **`/ohc-autopilot`**                                          | PLAN → BUILD → REVIEW chain (**`full auto`** skips plan gate in keyword map)                |
+| **document-intake**             | `"from my docs"`, `"existing spec"`, `"external spec"`, **`"document intake"`**, **`/ohc-document-intake`** | Respect third-party PRD/RFC layouts; emit `.ohc/doc-sources.md` + traced `.ohc/plans/`      |
+| **test-driven-development**     | `"tdd"`, `"test first"`                                                                                     | RED-GREEN-REFACTOR, 0 failing 0 skipped                                                     |
+| **subagent-driven-development** | referenced by BUILD workflow                                                                                | Git worktrees, dispatch protocol                                                            |
+| **systematic-debugging**        | `"debug"`, `"broken"`, `"not working"`, **`"why is"`**                                                      | Hypothesis before fix                                                                       |
+| **requesting-code-review**      | `"review"`, `"code review"`, **`"check this"`**                                                             | Two-pass: spec then quality                                                                 |
+| **finishing-a-branch**          | `"ship"`, `"ship it"`, **`"finish branch"`**                                                                | Pre-merge check, changelog, PR, cleanup + optional **`references/production-checklist.md`** |
+| **retrospective**               | `"retro"`, `"retrospective"`                                                                                | Session diff, pattern extraction, memory update                                             |
+| **context7-aware-coding**       | referenced when using libs                                                                                  | Live docs via Context7 — cache-first via `.ohc/research/`, no guessing                      |
+| **writing-skills**              | reference doc (meta)                                                                                        | Skill authoring guide and structure                                                         |
+| **ralph**                       | `"ralph"`, `"keep going"`, `"ralph mode"`, **`/ohc-ralph`**                                                 | Persistent BUILD until tests pass                                                           |
+| **caveman**                     | **`"stop caveman"`** / **`"normal mode"`** (exit); **`"caveman mode"`**, **`"compressed mode"`** (enter)    | Persistent compressed responses with technical accuracy                                     |
 
 The repo ships **16** skills under **`skills/*/SKILL.md`**. Canonical keyword list: **`hooks/keyword-map.json`**.
 
@@ -193,16 +204,16 @@ Each skill: `SKILL.md` (≤200 lines) + `references/` (on demand) + `scripts/` (
 
 ## MCP servers
 
-| Server           | Purpose                 | Key                                       |
-| ---------------- | ----------------------- | ----------------------------------------- |
-| **Context7**     | Live library docs       | Optional (free at context7.com/dashboard) |
-| **GitHub MCP**   | Repos, PRs, issues, CI  | `GITHUB_PERSONAL_ACCESS_TOKEN`            |
-| **Brave Search** | Web search              | `BRAVE_API_KEY`                           |
-| **Playwright**   | Browser automation, e2e | No                                        |
-| **Firecrawl**    | Web scraping            | `FIRECRAWL_API_KEY`                       |
-| **Linear**       | Remote MCP (`mcp.linear.app`) | No secret in default `ohc setup` (`scripts/setup/index.js`) |
-| **Sentry**       | Hosted MCP (`mcp.sentry.dev`)   | No secret in default setup (add auth if your org requires it) |
-| **Figma**        | Hosted MCP (`mcp.figma.com`)    | No secret in default setup (add tokens if your org requires it) |
+| Server           | Purpose                       | Key                                                             |
+| ---------------- | ----------------------------- | --------------------------------------------------------------- |
+| **Context7**     | Live library docs             | Optional (free at context7.com/dashboard)                       |
+| **GitHub MCP**   | Repos, PRs, issues, CI        | `GITHUB_PERSONAL_ACCESS_TOKEN`                                  |
+| **Brave Search** | Web search                    | `BRAVE_API_KEY`                                                 |
+| **Playwright**   | Browser automation, e2e       | No                                                              |
+| **Firecrawl**    | Web scraping                  | `FIRECRAWL_API_KEY`                                             |
+| **Linear**       | Remote MCP (`mcp.linear.app`) | No secret in default `ohc setup` (`scripts/setup/index.js`)     |
+| **Sentry**       | Hosted MCP (`mcp.sentry.dev`) | No secret in default setup (add auth if your org requires it)   |
+| **Figma**        | Hosted MCP (`mcp.figma.com`)  | No secret in default setup (add tokens if your org requires it) |
 
 Interactive **`ohc setup`** only prompts for env vars where **`scripts/setup/index.js`** marks **`needsKey: true`** for your selection (Context7 remains optional).
 
