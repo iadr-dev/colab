@@ -22,13 +22,14 @@
 const fs   = require('fs');
 const path = require('path');
 
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+function getOHC() {
+  return path.join(process.cwd(), '.ohc');
+}
 
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 
 function resultPath(teamId, workerName) {
-  return path.join(OHC, 'state', 'team', teamId, 'workers', workerName, 'RESULT.json');
+  return path.join(getOHC(), 'state', 'team', teamId, 'workers', workerName, 'RESULT.json');
 }
 
 /**
@@ -62,7 +63,7 @@ function read(teamId, workerName) {
  * Read all worker results for a team. Missing ones are returned as null.
  */
 function readAll(teamId) {
-  const workersDir = path.join(OHC, 'state', 'team', teamId, 'workers');
+  const workersDir = path.join(getOHC(), 'state', 'team', teamId, 'workers');
   if (!fs.existsSync(workersDir)) return [];
   return fs.readdirSync(workersDir).map(name => ({
     name,
