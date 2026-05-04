@@ -1,15 +1,26 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "oh-my-colab",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "Team-first AI coding workflows: methodology, orchestration, and persistent memory (Claude Code + multi-platform CLI). Ships skills, slash commands, agents, and hooks. Use npm ohc setup for full cross-platform onboarding.",
   "author": {
     "name": "iadr-dev",
     "url": "https://github.com/iadr-dev"
   },
   "homepage": "https://github.com/iadr-dev/colab",
-  "repository": "https://github.com/iadr-dev/colab",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iadr-dev/colab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iadr-dev/colab/issues"
+  },
   "license": "MIT",
+  "engines": {
+    "claudeCode": ">=2.0.0",
+    "node": ">=18.0.0"
+  },
+  "category": "development",
   "keywords": [
     "claude-code",
     "skills",
@@ -17,10 +28,80 @@
     "hooks",
     "workflows",
     "tdd",
-    "teams"
+    "teams",
+    "multi-platform",
+    "persistent-memory",
+    "orchestration"
+  ],
+  "tags": [
+    "productivity",
+    "automation",
+    "ai",
+    "agents",
+    "coordination",
+    "tdd",
+    "code-review",
+    "planning"
   ],
   "skills": "./skills/",
   "commands": "./commands/",
   "agents": "./agents/",
-  "hooks": "./hooks/plugin-hooks.json"
+  "hooks": "./hooks/plugin-hooks.json",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "description": "Context7 — live library docs (free; key optional)",
+      "optional": true
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "description": "GitHub MCP — repos, PRs, issues, CI",
+      "optional": true
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "description": "Brave Search — web search",
+      "optional": true
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp"
+      ],
+      "description": "Playwright — browser automation, e2e testing",
+      "optional": true
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "description": "Firecrawl — web scraping",
+      "optional": true
+    },
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.linear.app/mcp"
+      ],
+      "description": "Linear — project management",
+      "optional": true
+    }
+  }
 }

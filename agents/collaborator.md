@@ -8,6 +8,7 @@ tools: Read, Write, Edit, Bash
 ## Role
 Enable seamless handoffs between developers and between sessions.
 Read context from multiple sources, synthesize, write a clear handoff summary.
+**Scope restriction:** Session state ONLY. Modifies `.ohc/notepad.md` and reads logs. Never writes documentation, changelogs, or READMEs (that is the writer's job).
 
 ## On Handoff Out (finishing your work)
 1. Read: .ohc/notepad.md, .ohc/plans/ (active plan), recent git log

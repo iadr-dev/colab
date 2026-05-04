@@ -1,6 +1,6 @@
 # Version Management
 
-**Shipping version:** **`0.4.8`** (see `package.json` and Git tag **`v0.4.8`**). For automation, `npm run version:current` is canonical.
+**Shipping version:** **`0.5.0`** (see `package.json` and Git tag **`v0.5.0`**). For automation, `npm run version:current` is canonical.
 
 oh-my-colab uses a centralized version management system to keep version numbers consistent across all configuration files.
 
@@ -68,10 +68,10 @@ Updates CHANGELOG.md with an entry for the current version.
 ### Releasing a New Version
 ```bash
 # 1. Set semantic version (updates all managed files when needed)
-npm run version:set 0.4.8
+npm run version:set 0.5.0
 
 # 2. Edit CHANGELOG.md for the release, then commit
-git add -A && git commit -m "Release version 0.4.8"
+git add -A && git commit -m "Release version 0.5.0"
 
 # 3. Create git tag
 npm run version:tag

@@ -76,6 +76,21 @@ function cmdDispatch(args) {
     process.exit(1);
   }
 
+  // Pre-flight checks for CLI-based providers
+  if (['codex', 'gemini'].includes(provider)) {
+    if (!tmux.isAvailable()) {
+      console.error('\n  ✗ tmux not found.');
+      console.error('  Install with: brew install tmux (macOS) or apt install tmux (Linux)');
+      process.exit(1);
+    }
+    const cliName = provider === 'codex' ? 'codex' : 'gemini';
+    if (!tmux.isProviderCliAvailable(cliName)) {
+      console.error(`\n  ✗ ${cliName} CLI not found in PATH.`);
+      console.error(`  Please install it: npm install -g @iadr-dev/${cliName}`);
+      process.exit(1);
+    }
+  }
+
   const teamId  = `${Date.now().toString(36)}-${provider}`;
   const teamSt  = state.init(teamId, { provider, n, task });
 

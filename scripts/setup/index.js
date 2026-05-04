@@ -22,8 +22,8 @@ const MCP_SERVERS = [
   { name: 'playwright',   label: 'Playwright    — browser automation, e2e testing',         needsKey: false,      command: 'npx', args: ['-y', '@playwright/mcp'] },
   { name: 'firecrawl',    label: 'Firecrawl     — web scraping',                            needsKey: true,       keyName: 'FIRECRAWL_API_KEY',                 command: 'npx', args: ['-y', 'firecrawl-mcp'] },
   { name: 'linear',       label: 'Linear        — project management',                      needsKey: false,      command: 'npx', args: ['-y', 'mcp-remote', 'https://mcp.linear.app/mcp'] },
-  { name: 'sentry',       label: 'Sentry        — error monitoring',                        needsKey: false,      url: 'https://mcp.sentry.dev/mcp' },
-  { name: 'figma',        label: 'Figma         — design context',                          needsKey: false,      url: 'https://mcp.figma.com/mcp' },
+  { name: 'sentry',       label: 'Sentry        — error monitoring',                        needsKey: true,       keyName: 'SENTRY_AUTH',                     url: 'https://mcp.sentry.dev/mcp' },
+  { name: 'figma',        label: 'Figma         — design context',                          needsKey: false,      url: 'https://mcp.figma.com/sse' },
 ];
 
 async function run() {
@@ -165,6 +165,8 @@ async function run() {
   stdout.write('    1. Run /ohc-explore to understand this codebase\n');
   stdout.write('    2. Run /ohc-plan to start building something\n');
   stdout.write('    3. Type "autopilot" to let oh-my-colab drive\n\n');
+
+  await promptStar(config);
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -376,7 +378,7 @@ function genContextSeed({ seedDomainTemplates }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.4.8', project_name: project.projectName,
+    version: '0.5.0', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -728,11 +730,110 @@ function writeHud({ hudStyle }) {
 
 function writeConfig({ platforms, teamMode, workflow, hudStyle }) {
   const { version } = require(path.join(PKG_ROOT, 'package.json'));
-  write(path.join(os.homedir(), '.ohc', 'config.json'), JSON.stringify({
+  const configPath = path.join(os.homedir(), '.ohc', 'config.json');
+  let existing = {};
+  try { existing = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
+  write(configPath, JSON.stringify({
+    ...existing,
     version, platforms, teamMode,
     defaultWorkflow: workflow, hudStyle,
     installedAt: new Date().toISOString()
   }, null, 2));
+}
+
+// ── GitHub Star Prompt ──────────────────────────────────────────────────────
+
+/**
+ * Prompt user to star the repo at end of onboarding.
+ * Hybrid approach:
+ *   - If GITHUB_PERSONAL_ACCESS_TOKEN was provided during MCP setup → use GitHub API
+ *   - Otherwise → open browser to the repo page
+ * One-time: writes starPromptShown to ~/.ohc/config.json
+ */
+async function promptStar({ mcpKeys }) {
+  const configPath = path.join(os.homedir(), '.ohc', 'config.json');
+  let config = {};
+  try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
+  if (config.starPromptShown) return;
+
+  const REPO = 'iadr-dev/colab';
+  const REPO_URL = `https://github.com/${REPO}`;
+
+  process.stdout.write('  ⭐ Enjoying oh-my-colab? Star us on GitHub!\n');
+  process.stdout.write(`     ${REPO_URL}\n\n`);
+
+  const pat = mcpKeys?.github?.GITHUB_PERSONAL_ACCESS_TOKEN
+           || process.env.GITHUB_PERSONAL_ACCESS_TOKEN
+           || null;
+
+  const rl = require('readline').createInterface({ input: process.stdin, output: process.stdout });
+
+  const answer = await new Promise(resolve => {
+    rl.question(pat
+      ? '  Star the repo now? We\'ll use your GitHub token. (y/N) '
+      : '  Open the repo in your browser to star it? (y/N) ',
+      a => { rl.close(); resolve((a || '').trim().toLowerCase()); }
+    );
+  });
+
+  if (answer === 'y' || answer === 'yes') {
+    if (pat) {
+      // Use GitHub API: PUT /user/starred/:owner/:repo
+      try {
+        const https = require('https');
+        await new Promise((resolve, reject) => {
+          const req = https.request({
+            hostname: 'api.github.com',
+            path: `/user/starred/${REPO}`,
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${pat}`,
+              'User-Agent': 'oh-my-colab-setup',
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Length': 0
+            }
+          }, res => {
+            if (res.statusCode === 204 || res.statusCode === 304) {
+              process.stdout.write('  ✓ Starred! Thank you for supporting oh-my-colab 🎉\n\n');
+              resolve();
+            } else {
+              // Non-fatal — fall back to browser
+              process.stdout.write(`  ⚠ API returned ${res.statusCode}. Opening browser instead...\n`);
+              openBrowser(REPO_URL);
+              resolve();
+            }
+            res.resume();
+          });
+          req.on('error', () => { openBrowser(REPO_URL); resolve(); });
+          req.end();
+        });
+      } catch {
+        openBrowser(REPO_URL);
+      }
+    } else {
+      openBrowser(REPO_URL);
+    }
+  } else {
+    process.stdout.write('  No worries — you can star us anytime at ' + REPO_URL + '\n\n');
+  }
+
+  // Mark as shown so we don't ask again
+  try {
+    config.starPromptShown = true;
+    write(configPath, JSON.stringify(config, null, 2));
+  } catch {}
+}
+
+function openBrowser(url) {
+  try {
+    const platform = process.platform;
+    if (platform === 'darwin')       execSync(`open "${url}"`, { stdio: 'ignore' });
+    else if (platform === 'win32')   execSync(`start "" "${url}"`, { stdio: 'ignore' });
+    else                             execSync(`xdg-open "${url}"`, { stdio: 'ignore' });
+    process.stdout.write('  ✓ Opened in browser — click ⭐ to star! Thank you 🎉\n\n');
+  } catch {
+    process.stdout.write(`  Could not open browser. Visit: ${url}\n\n`);
+  }
 }
 
 module.exports = run;

@@ -8,12 +8,12 @@
  * unless --force is passed.
  */
 
-const { execSync, spawnSync } = require('child_process');
+const cp = require('child_process');
 const fs   = require('fs');
 const path = require('path');
 
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+const getCWD = () => process.cwd();
+const getOHC = () => path.join(getCWD(), '.ohc');
 
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 
@@ -21,7 +21,7 @@ function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
  * Get the canonical worktree path for a worker.
  */
 function worktreePath(teamId, workerName) {
-  return path.join(OHC, 'team', teamId, 'worktrees', workerName);
+  return path.join(getOHC(), 'team', teamId, 'worktrees', workerName);
 }
 
 /**
@@ -33,8 +33,8 @@ function create(teamId, workerName, baseBranch = 'HEAD') {
   const branch = `ohc/${teamId}-${workerName}`;
   mkdir(path.dirname(wt));
 
-  const r = spawnSync('git', ['worktree', 'add', wt, '-b', branch, baseBranch], {
-    cwd: CWD, encoding: 'utf8', stdio: 'pipe'
+  const r = cp.spawnSync('git', ['worktree', 'add', wt, '-b', branch, baseBranch], {
+    cwd: getCWD(), encoding: 'utf8', stdio: 'pipe'
   });
 
   if (r.status !== 0) {
@@ -45,7 +45,7 @@ function create(teamId, workerName, baseBranch = 'HEAD') {
   // Each worker's `.ohc/research` points at the parent repo's cache so every
   // worker can `lookup()` without re-fetching.
   try {
-    const parentResearch = path.join(OHC, 'research');
+    const parentResearch = path.join(getOHC(), 'research');
     const workerOhc      = path.join(wt, '.ohc');
     const workerResearch = path.join(workerOhc, 'research');
     if (fs.existsSync(parentResearch)) {
@@ -65,7 +65,7 @@ function create(teamId, workerName, baseBranch = 'HEAD') {
  */
 function isDirty(wtPath) {
   if (!fs.existsSync(wtPath)) return false;
-  const r = spawnSync('git', ['status', '--porcelain'], { cwd: wtPath, encoding: 'utf8', stdio: 'pipe' });
+  const r = cp.spawnSync('git', ['status', '--porcelain'], { cwd: wtPath, encoding: 'utf8', stdio: 'pipe' });
   return (r.stdout || '').trim().length > 0;
 }
 
@@ -87,14 +87,14 @@ function remove(teamId, workerName, { force = false } = {}) {
     };
   }
 
-  const r = spawnSync('git', ['worktree', 'remove', wt, ...(force ? ['--force'] : [])], {
-    cwd: CWD, encoding: 'utf8', stdio: 'pipe'
+  const r = cp.spawnSync('git', ['worktree', 'remove', wt, ...(force ? ['--force'] : [])], {
+    cwd: getCWD(), encoding: 'utf8', stdio: 'pipe'
   });
 
   if (r.status !== 0) {
     // Fall back to rm if git worktree remove fails (branch might be gone)
-    spawnSync('rm', ['-rf', wt], { cwd: CWD });
-    spawnSync('git', ['worktree', 'prune'], { cwd: CWD });
+    cp.spawnSync('rm', ['-rf', wt], { cwd: getCWD() });
+    cp.spawnSync('git', ['worktree', 'prune'], { cwd: getCWD() });
   }
 
   return { success: true, wasDirty: dirty };
@@ -104,7 +104,7 @@ function remove(teamId, workerName, { force = false } = {}) {
  * List all ohc-owned worktrees.
  */
 function list() {
-  const r = spawnSync('git', ['worktree', 'list', '--porcelain'], { cwd: CWD, encoding: 'utf8', stdio: 'pipe' });
+  const r = cp.spawnSync('git', ['worktree', 'list', '--porcelain'], { cwd: getCWD(), encoding: 'utf8', stdio: 'pipe' });
   const lines = (r.stdout || '').split('\n');
   const results = [];
   let cur = {};
@@ -129,12 +129,12 @@ function mergeAll(teamId, workerBranches) {
   const merged = [], conflicted = [], skipped = [];
   for (const branch of workerBranches) {
     // Skip if branch doesn't exist (worker failed to create)
-    const exists = spawnSync('git', ['rev-parse', '--verify', branch], { cwd: CWD, stdio: 'pipe' });
+    const exists = cp.spawnSync('git', ['rev-parse', '--verify', branch], { cwd: getCWD(), stdio: 'pipe' });
     if (exists.status !== 0) { skipped.push(branch); continue; }
 
     const msg = `ohc: merge worker branch ${branch} (team ${teamId})`;
-    const r = spawnSync('git', ['merge', '--no-ff', '--no-edit', '-m', msg, branch], {
-      cwd: CWD, encoding: 'utf8', stdio: 'pipe',
+    const r = cp.spawnSync('git', ['merge', '--no-ff', '--no-edit', '-m', msg, branch], {
+      cwd: getCWD(), encoding: 'utf8', stdio: 'pipe',
     });
     if (r.status === 0) {
       merged.push(branch);

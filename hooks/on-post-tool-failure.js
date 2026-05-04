@@ -12,9 +12,7 @@ const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
 const memory = require('../scripts/memory');
-
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+const { getOHC } = require('./resolve-paths');
 
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
 
@@ -29,7 +27,8 @@ rl.on('close', () => {
   const toolInput  = event.tool_input  || {};
   const toolOutput = event.tool_output || '';
   const exitCode   = event.exit_code   ?? event.tool_response?.exit_code ?? 1;
-  const sessionId  = read(path.join(OHC, 'state', 'current-session.txt'))?.trim();
+  const ohc = getOHC(process.cwd());
+  const sessionId  = read(path.join(ohc, 'state', 'current-session.txt'))?.trim();
 
   if (toolName !== 'Bash' || exitCode === 0) {
     process.stdout.write(JSON.stringify({ action: 'continue' }));
@@ -41,7 +40,7 @@ rl.on('close', () => {
 
   // Log failure
   if (sessionId) {
-    const log = path.join(OHC, 'state', 'sessions', sessionId, 'log.jsonl');
+    const log = path.join(ohc, 'state', 'sessions', sessionId, 'log.jsonl');
     try {
       fs.appendFileSync(log, JSON.stringify({
         type: 'tool_failure', tool: toolName,
@@ -55,7 +54,7 @@ rl.on('close', () => {
   // Track repeated failures — if this exact command base failed before this session,
   // append a gotcha entry to PROJECT.md so future sessions see the pattern
   if (sessionId) {
-    const logContent = read(path.join(OHC, 'state', 'sessions', sessionId, 'log.jsonl')) || '';
+    const logContent = read(path.join(ohc, 'state', 'sessions', sessionId, 'log.jsonl')) || '';
     const prevFailures = logContent.split('\n').filter(Boolean)
       .map(l => { try { return JSON.parse(l); } catch { return null; } })
       .filter(e => e?.type === 'tool_failure' && e.command?.startsWith(cmd.slice(0, 40)));

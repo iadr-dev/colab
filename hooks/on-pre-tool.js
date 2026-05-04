@@ -14,10 +14,7 @@
 const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { skillSkillMd } = require('./resolve-paths');
-
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+const { skillSkillMd, getOHC } = require('./resolve-paths');
 
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
@@ -25,7 +22,7 @@ function readJson(p, fallback) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
 }
 function readSkillReminder(skill, reason) {
-  const { abs, rel } = skillSkillMd(CWD, skill);
+  const { abs, rel } = skillSkillMd(process.cwd(), skill);
   const content = read(abs);
   if (!content) return null;
   return `<system_reminder skill="${skill}">
@@ -35,7 +32,7 @@ ${content.split('\n').slice(0, 40).join('\n')}
 </system_reminder>`;
 }
 function activeSkillsPath() {
-  return path.join(OHC, 'state', 'active-skills.json');
+  return path.join(getOHC(process.cwd()), 'state', 'active-skills.json');
 }
 function readActiveSkills() {
   return readJson(activeSkillsPath(), { skills: {} });
@@ -50,11 +47,12 @@ rl.on('close', () => {
 
   const toolName  = event.tool_name || '';
   const toolInput = event.tool_input || {};
-  const sessionId = read(path.join(OHC, 'state', 'current-session.txt'))?.trim();
+  const ohc = getOHC(process.cwd());
+  const sessionId = read(path.join(ohc, 'state', 'current-session.txt'))?.trim();
 
   // Log event
   if (sessionId) {
-    const log = path.join(OHC, 'state', 'sessions', sessionId, 'log.jsonl');
+    const log = path.join(ohc, 'state', 'sessions', sessionId, 'log.jsonl');
     try {
       fs.appendFileSync(log, JSON.stringify({
         type: 'tool_use', tool: toolName, input: toolInput, ts: Date.now()
@@ -72,7 +70,7 @@ rl.on('close', () => {
 
   // Scope validation for file-writing tools
   if (['Write', 'Edit', 'MultiEdit'].includes(toolName)) {
-    const notepad = read(path.join(OHC, 'notepad.md')) || '';
+    const notepad = read(path.join(getOHC(process.cwd()), 'notepad.md')) || '';
     const match = notepad.match(/## Current Task\n([\s\S]*?)(?=\n##|$)/);
     const task = match?.[1]?.trim() || '';
     if (task && task !== '(none)') {

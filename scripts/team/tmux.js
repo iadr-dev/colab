@@ -12,31 +12,45 @@
  * Sentinel file: .ohc/state/team/<teamId>/workers/<name>/tmux-exit
  */
 
-const { spawnSync, execSync } = require('child_process');
+const cp = require('child_process');
 const fs   = require('fs');
 const path = require('path');
 
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+function getOHC() {
+  return path.join(process.cwd(), '.ohc');
+}
 
 function sentinelPath(teamId, workerName) {
-  return path.join(OHC, 'state', 'team', teamId, 'workers', workerName, 'tmux-exit');
+  return path.join(getOHC(), 'state', 'team', teamId, 'workers', workerName, 'tmux-exit');
 }
 
 /**
  * Check if tmux is available.
  */
 function isAvailable() {
-  try { execSync('which tmux', { stdio: 'pipe' }); return true; } catch { return false; }
+  try { cp.execSync('which tmux', { stdio: 'pipe' }); return true; } catch { return false; }
+}
+
+/**
+ * Check if the given provider CLI (codex or gemini) is available in PATH.
+ */
+function isProviderCliAvailable(cli) {
+  try {
+    const cmd = process.platform === 'win32' ? `where ${cli}` : `which ${cli}`;
+    cp.execSync(cmd, { stdio: 'pipe' });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
  * Ensure a tmux session exists. Creates if not present.
  */
 function ensureSession(sessionName) {
-  const r = spawnSync('tmux', ['has-session', '-t', sessionName], { stdio: 'pipe' });
+  const r = cp.spawnSync('tmux', ['has-session', '-t', sessionName], { stdio: 'pipe' });
   if (r.status !== 0) {
-    spawnSync('tmux', ['new-session', '-d', '-s', sessionName], { stdio: 'pipe' });
+    cp.spawnSync('tmux', ['new-session', '-d', '-s', sessionName], { stdio: 'pipe' });
   }
 }
 
@@ -47,7 +61,7 @@ function ensureSession(sessionName) {
  * @param {string} cmd         - shell command to run
  */
 function spawnPane(sessionName, windowName, cmd) {
-  return spawnSync('tmux', ['new-window', '-t', sessionName, '-n', windowName, cmd], { stdio: 'pipe' });
+  return cp.spawnSync('tmux', ['new-window', '-t', sessionName, '-n', windowName, cmd], { stdio: 'pipe' });
 }
 
 /**
@@ -113,13 +127,14 @@ function allExited(teamId, workerNames) {
  * Get pane output from a tmux window.
  */
 function getPaneOutput(sessionName, windowName, lines = 50) {
-  const r = spawnSync('tmux', ['capture-pane', '-t', `${sessionName}:${windowName}`, '-p', '-S', `-${lines}`], {
+  const r = cp.spawnSync('tmux', ['capture-pane', '-t', `${sessionName}:${windowName}`, '-p', '-S', `-${lines}`], {
     stdio: 'pipe', encoding: 'utf8'
   });
-  return (r.stdout || '').trim();
+  const out = r.stdout ? r.stdout.toString() : '';
+  return out.trim();
 }
 
 module.exports = {
-  isAvailable, ensureSession, spawnPane, spawnWorkers, getPaneOutput,
+  isAvailable, isProviderCliAvailable, ensureSession, spawnPane, spawnWorkers, getPaneOutput,
   pollExitStatuses, allExited, sentinelPath,
 };

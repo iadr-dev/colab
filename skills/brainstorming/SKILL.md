@@ -25,7 +25,14 @@ read optional domain docs (`CONTEXT.md` / `CONTEXT-MAP.md`) when present.
 If they attach **outside** authoritative docs in non-OHC layouts, run **`document-intake`** so naming aligns with glossary rules in `skills/writing-plans/references/domain-docs.md`. For greenfield framing, optionally use `references/product-brief-template.md`.
 Sharpen overloaded terms before designing.
 
-Stop when you understand the problem well enough to design for it.
+### Clarity Scoring Rubric
+Before brainstorming, internally score the user's initial request:
+- **Vague (0-25%)** → Need 3+ clarifying questions.
+- **Unclear (25-50%)** → Need 1-2 clarifying questions.
+- **Clear (50-75%)** → Confirm understanding, proceed with 0-1 questions.
+- **Precise (75-100%)** → Skip questions, go straight to Phase 2.
+
+Stop asking questions when the request reaches **Clear (50-75%)** or higher. You must understand the problem well enough to design for it.
 
 ## Phase 2: Idea Expansion
 

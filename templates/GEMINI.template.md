@@ -18,9 +18,12 @@ Greet user with one-line status after reading.
 - reviewer (opus): code review, spec compliance, security
 - verifier (sonnet): test execution — always run before claiming done
 - debugger (sonnet): hypothesis-driven root cause
+- architect (opus): system design, ADRs
 - researcher (haiku): Context7 docs, Brave Search
 - writer (haiku): changelogs, PR descriptions, docs
-- collaborator (sonnet): team handoffs, notepad updates
+- collaborator (opus): team handoffs, notepad updates
+- librarian (haiku): context efficiency, large file summarization
+- advisor (opus): proactive risk assessment, gap analysis
 
 ## Workflows
 - EXPLORE: read codebase → populate .ohc/PROJECT.md
