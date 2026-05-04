@@ -15,9 +15,9 @@ const fs   = require('fs');
 const path = require('path');
 const os   = require('os');
 
-const CWD    = process.cwd();
-const OHC    = path.join(CWD, '.ohc');
-const GLOBAL = path.join(os.homedir(), '.ohc');
+const getCWD    = () => process.cwd();
+const getOHC    = () => path.join(getCWD(), '.ohc');
+const getGLOBAL = () => process.env.OHC_GLOBAL_DIR || path.join(os.homedir(), '.ohc');
 
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
@@ -28,11 +28,11 @@ function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return nul
  */
 function snapshotNotepad(sessionId, ts = Date.now()) {
   if (!sessionId) return;
-  const snapDir = path.join(OHC, 'state', 'sessions', sessionId);
+  const snapDir = path.join(getOHC(), 'state', 'sessions', sessionId);
   mkdir(snapDir);
 
-  const notepad      = read(path.join(OHC, 'notepad.md')) || '(empty)';
-  const activeSkills = read(path.join(OHC, 'state', 'active-skills.json')) || '{}';
+  const notepad      = read(path.join(getOHC(), 'notepad.md')) || '(empty)';
+  const activeSkills = read(path.join(getOHC(), 'state', 'active-skills.json')) || '{}';
 
   const snapshot = `# PreCompact Snapshot
 session: ${sessionId}
@@ -54,11 +54,11 @@ ${activeSkills}
  * @param {object} entry - { task, what_worked, what_failed, source, sessionId }
  */
 function appendLearning(entry) {
-  mkdir(GLOBAL);
-  const file = path.join(GLOBAL, 'learnings.jsonl');
+  mkdir(getGLOBAL());
+  const file = path.join(getGLOBAL(), 'learnings.jsonl');
   const line = JSON.stringify({
     ts: new Date().toISOString(),
-    project: path.basename(CWD),
+    project: path.basename(getCWD()),
     ...entry
   });
   fs.appendFileSync(file, line + '\n');
@@ -69,11 +69,11 @@ function appendLearning(entry) {
  * @param {object} entry - { sessionId, durationMin, plan_hit_rate, tests_failed_count, retro_done }
  */
 function appendSelfEval(entry) {
-  mkdir(GLOBAL);
-  const file = path.join(GLOBAL, 'self-eval.jsonl');
+  mkdir(getGLOBAL());
+  const file = path.join(getGLOBAL(), 'self-eval.jsonl');
   const line = JSON.stringify({
     ts: new Date().toISOString(),
-    project: path.basename(CWD),
+    project: path.basename(getCWD()),
     ...entry
   });
   fs.appendFileSync(file, line + '\n');
@@ -84,7 +84,7 @@ function appendSelfEval(entry) {
  * Returns an array of parsed objects (newest last).
  */
 function readRecentLearnings(n = 5) {
-  const file = path.join(GLOBAL, 'learnings.jsonl');
+  const file = path.join(getGLOBAL(), 'learnings.jsonl');
   if (!fs.existsSync(file)) return [];
   const lines = fs.readFileSync(file, 'utf8')
     .split('\n')
@@ -98,7 +98,7 @@ function readRecentLearnings(n = 5) {
  * Called when a Bash command fails twice on similar commands.
  */
 function appendToProjectGotchas(gotcha) {
-  const projectFile = path.join(OHC, 'PROJECT.md');
+  const projectFile = path.join(getOHC(), 'PROJECT.md');
   if (!fs.existsSync(projectFile)) return;
 
   const content  = fs.readFileSync(projectFile, 'utf8');

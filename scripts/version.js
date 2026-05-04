@@ -6,7 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const child_process = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const VERSION_FILES = [
@@ -288,15 +288,15 @@ class VersionManager {
   tagRelease(version = this.currentVersion) {
     try {
       // Check if git repo
-      execSync('git rev-parse --git-dir', { stdio: 'pipe' });
+      child_process.execSync('git rev-parse --git-dir', { stdio: 'pipe' });
       
       // Create git tag
-      execSync(`git tag -a v${version} -m "Release v${version}"`, { stdio: 'pipe' });
+      child_process.execSync(`git tag -a v${version} -m "Release v${version}"`, { stdio: 'pipe' });
       console.log(`✅ Created git tag: v${version}`);
       
       // Optionally push tag
       try {
-        execSync('git push origin --tags', { stdio: 'pipe' });
+        child_process.execSync('git push origin --tags', { stdio: 'pipe' });
         console.log(`✅ Pushed tag to origin`);
       } catch (e) {
         console.log(`⚠ Could not push tag to origin: ${e.message}`);

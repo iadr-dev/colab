@@ -15,6 +15,8 @@ const MCP_HINTS = [
   { label: 'Brave Search', vars: ['BRAVE_API_KEY'] },
   { label: 'Context7 optional', vars: ['CONTEXT7_API_KEY'] },
   { label: 'Firecrawl', vars: ['FIRECRAWL_API_KEY'] },
+  { label: 'Sentry MCP', vars: ['SENTRY_AUTH'], note: 'URL: https://mcp.sentry.dev/mcp' },
+  { label: 'Figma MCP', vars: [], note: 'URL: https://mcp.figma.com/sse' },
 ];
 
 function acc(p) {
@@ -97,8 +99,11 @@ function main() {
     }
   }
 
-  MCP_HINTS.forEach(({ label, vars }) => {
-    if (vars.every(v => !process.env[v])) notes.push(`${label}: ${vars.join(', ')} unset`);
+  MCP_HINTS.forEach(({ label, vars, note }) => {
+    const missing = vars.filter(v => !process.env[v]);
+    if (missing.length > 0) notes.push(`${label}: ${missing.join(', ')} unset`);
+    else if (vars.length > 0) passes.push(`${label} env vars set`);
+    if (note) notes.push(`${label} tip: ${note}`);
   });
 
   if (spawnSync('bash', ['--version'], { encoding: 'utf8' }).status === 0)
