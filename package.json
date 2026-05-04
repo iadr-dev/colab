@@ -22,6 +22,9 @@
   },
   "scripts": {
     "test": "node tests/smoke/run-smoke.js",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:all": "npm test && vitest run",
     "test:shell": "bash tests/smoke/test-all.sh",
     "lint:skills": "node tests/smoke/check-skill-lines.js",
     "prepublishOnly": "npm test && npm run lint:skills",
@@ -45,5 +48,9 @@
   "homepage": "https://github.com/iadr-dev/colab#readme",
   "bugs": {
     "url": "https://github.com/iadr-dev/colab/issues"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.5",
+    "vitest": "^4.1.5"
   }
 }
