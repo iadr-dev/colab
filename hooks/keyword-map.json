@@ -53,6 +53,16 @@
   "handing off":      { "agent": "collaborator",                  "mode": "single" },
   "picking up":       { "agent": "collaborator",                  "mode": "single" },
 
+  "find code":        { "agent": "librarian",                     "mode": "single" },
+  "search impl":      { "agent": "librarian",                     "mode": "single" },
+  "where is":         { "agent": "librarian",                     "mode": "single" },
+  "read block":       { "agent": "librarian",                     "mode": "single" },
+
+  "risk check":       { "agent": "advisor",                       "mode": "single" },
+  "review plan":      { "agent": "advisor",                       "mode": "single" },
+  "audit this":       { "agent": "advisor",                       "mode": "single" },
+  "check conventions": { "agent": "advisor",                      "mode": "single" },
+
   "discipline":       { "skill": "ohc-coding-discipline",         "mode": "enforce" },
   "scope check":      { "script": "skills/ohc-coding-discipline/scripts/scope-check.sh" },
 
@@ -61,6 +71,16 @@
   "normal mode":      { "skill": "caveman",                       "mode": "persistent", "action": "deactivate" },
   "caveman mode":     { "skill": "caveman",                       "mode": "persistent", "action": "activate" },
   "compressed mode":  { "skill": "caveman",                       "mode": "persistent", "action": "activate" },
+
+  "ultrawork":        { "workflow": "PLAN+BUILD+REVIEW",          "mode": "chain",       "options": { "parallel": true } },
+  "ulw":              { "workflow": "PLAN+BUILD+REVIEW",          "mode": "chain",       "options": { "parallel": true } },
+  
+  "deepsearch":       { "skill": "explore-codebase",              "mode": "deep" },
+  "ultrathink":       { "skill": "brainstorming",                 "mode": "deep" },
+  "ralplan":          { "skill": "writing-plans",                 "mode": "pipeline",    "options": { "ralphMode": true } },
+  
+  "stopomc":          { "skill": "all",                           "mode": "persistent", "action": "deactivate" },
+  "stop all":         { "skill": "all",                           "mode": "persistent", "action": "deactivate" },
 
   "_custom": {
     "_comment": "Add your team's custom triggers here. Same format as above.",

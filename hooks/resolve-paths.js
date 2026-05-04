@@ -39,4 +39,8 @@ function skillSkillMd(cwd, skill) {
   return { abs: src, rel: `skills/${skill}/SKILL.md` };
 }
 
-module.exports = { keywordMapJson, skillSkillMd };
+function getOHC(cwd) {
+  return path.join(cwd, '.ohc');
+}
+
+module.exports = { keywordMapJson, skillSkillMd, getOHC };

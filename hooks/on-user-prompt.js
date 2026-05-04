@@ -12,10 +12,10 @@
 const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { keywordMapJson, skillSkillMd } = require('./resolve-paths');
+const { keywordMapJson, skillSkillMd, getOHC } = require('./resolve-paths');
 
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+const getCWD = () => process.cwd();
+const getOHCPath = () => getOHC(getCWD());
 
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
@@ -27,7 +27,7 @@ function writeJson(p, data) {
   fs.writeFileSync(p, JSON.stringify(data, null, 2));
 }
 function readSkillReminder(skill, reason) {
-  const { abs, rel } = skillSkillMd(CWD, skill);
+  const { abs, rel } = skillSkillMd(getCWD(), skill);
   const content = read(abs);
   if (!content) return null;
   return `<system_reminder skill="${skill}">
@@ -37,7 +37,7 @@ ${content.split('\n').slice(0, 40).join('\n')}
 </system_reminder>`;
 }
 function activeSkillsPath() {
-  return path.join(OHC, 'state', 'active-skills.json');
+  return path.join(getOHCPath(), 'state', 'active-skills.json');
 }
 function readActiveSkills() {
   return readJson(activeSkillsPath(), { skills: {} });
@@ -51,7 +51,7 @@ function setActiveSkill(skill, isActive) {
 }
 
 let keywordMap = {};
-try { keywordMap = JSON.parse(read(keywordMapJson(CWD)) || '{}'); }
+try { keywordMap = JSON.parse(read(keywordMapJson(getCWD())) || '{}'); }
 catch {}
 
 let raw = '';
@@ -80,6 +80,9 @@ rl.on('close', () => {
     if (kw.startsWith('_') || typeof cfg !== 'object') continue;
     if (!msgText.includes(kw.toLowerCase())) continue;
 
+    const isParallel = cfg.parallel || cfg.options?.parallel;
+    const isRalph    = cfg.ralphMode || cfg.options?.ralphMode;
+
     if (cfg.skill) {
       if (deactivatedSkills.has(cfg.skill)) continue;
       if (cfg.mode === 'persistent') {
@@ -94,10 +97,13 @@ Keyword "${kw}" detected. Deactivating persistent skill: ${cfg.skill}
         if (cfg.action === 'activate') setActiveSkill(cfg.skill, true);
       }
 
-      const reminder = readSkillReminder(
-        cfg.skill,
-        `Keyword "${kw}" detected. Activating skill: ${cfg.skill}`
-      );
+      const reason = [
+        `Keyword "${kw}" detected. Activating skill: ${cfg.skill}`,
+        isRalph ? 'Option: ralphMode active — prioritize recursive task decomposition.' : null,
+        isParallel ? 'Optimization: use parallel execution where possible (ultrawork mode).' : null
+      ].filter(Boolean).join('\n');
+
+      const reminder = readSkillReminder(cfg.skill, reason);
       if (reminder) reminders.push(reminder);
       remindedSkills.add(cfg.skill);
     }
@@ -107,12 +113,14 @@ Keyword "${kw}" detected. Deactivating persistent skill: ${cfg.skill}
 Keyword "${kw}" detected. Run ${cfg.workflow} workflow.
 ${cfg.planGate ? 'Gate: pause at plan for human confirmation before BUILD.' : ''}
 ${(cfg.mode === 'persistence' || cfg.persistence) ? `Mode: persistence — keep going until tests pass (stop after ${cfg.stopOnBlocked || 3} blocked attempts).` : ''}
+${isParallel ? 'Optimization: use parallel execution where possible (ultrawork mode).' : ''}
+${isRalph    ? 'Option: ralphMode active — prioritize recursive task decomposition.' : ''}
 </system_reminder>`);
     }
 
     if (cfg.agent) {
       reminders.push(`<system_reminder agent="${cfg.agent}">
-Keyword "${kw}" detected. Dispatch ${cfg.agent} agent via the Task tool.
+Keyword "${kw}" detected. Dispatch ${cfg.agent} agent via the Task tool for specialized ${cfg.agent === 'librarian' ? 'code exploration' : 'risk assessment'}.
 </system_reminder>`);
     }
   }
@@ -120,7 +128,17 @@ Keyword "${kw}" detected. Dispatch ${cfg.agent} agent via the Task tool.
   // Inject reminders for currently active persistent skills
   for (const skill of Object.keys(readActiveSkills().skills || {})) {
     if (remindedSkills.has(skill) || deactivatedSkills.has(skill)) continue;
-    const reminder = readSkillReminder(skill, `Persistent skill active: ${skill}`);
+    
+    // Check if there's a specialized mode for this skill in the keyword map
+    let mode = 'single';
+    for (const cfg of Object.values(keywordMap)) {
+      if (cfg.skill === skill && cfg.mode) {
+        mode = cfg.mode;
+        break;
+      }
+    }
+
+    const reminder = readSkillReminder(skill, `Persistent skill active: ${skill}${mode !== 'single' ? ` (mode: ${mode})` : ''}`);
     if (reminder) reminders.push(reminder);
   }
 

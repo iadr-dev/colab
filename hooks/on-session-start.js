@@ -10,33 +10,35 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
-const GLOBAL = path.join(os.homedir(), '.ohc');
+const { getOHC } = require('./resolve-paths');
+
+const getCWD    = () => process.cwd();
+const getGLOBAL = () => path.join(os.homedir(), '.ohc');
 const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 function read(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 
 // Init session dirs
-mkdir(path.join(OHC, 'state', 'sessions', SESSION_ID));
-mkdir(path.join(OHC, 'plans'));
-mkdir(path.join(OHC, 'skills'));
-mkdir(path.join(OHC, 'research'));
-mkdir(path.join(OHC, 'logs'));
+const ohc = getOHC(getCWD());
+mkdir(path.join(ohc, 'state', 'sessions', SESSION_ID));
+mkdir(path.join(ohc, 'plans'));
+mkdir(path.join(ohc, 'skills'));
+mkdir(path.join(ohc, 'research'));
+mkdir(path.join(ohc, 'logs'));
 
 fs.writeFileSync(
-  path.join(OHC, 'state', 'sessions', SESSION_ID, 'meta.json'),
-  JSON.stringify({ started: new Date().toISOString(), cwd: CWD }, null, 2)
+  path.join(ohc, 'state', 'sessions', SESSION_ID, 'meta.json'),
+  JSON.stringify({ started: new Date().toISOString(), cwd: getCWD() }, null, 2)
 );
-fs.writeFileSync(path.join(OHC, 'state', 'current-session.txt'), SESSION_ID);
+fs.writeFileSync(path.join(ohc, 'state', 'current-session.txt'), SESSION_ID);
 
 // Load memory files
-const soul     = read(path.join(GLOBAL, 'SOUL.md'));
-const user     = read(path.join(GLOBAL, 'USER.md'));
-const project  = read(path.join(OHC, 'PROJECT.md'));
-const notepad  = read(path.join(OHC, 'notepad.md'));
-const workflow = read(path.join(OHC, 'state', 'current-workflow.json'));
+const soul     = read(path.join(getGLOBAL(), 'SOUL.md'));
+const user     = read(path.join(getGLOBAL(), 'USER.md'));
+const project  = read(path.join(ohc, 'PROJECT.md'));
+const notepad  = read(path.join(ohc, 'notepad.md'));
+const workflow = read(path.join(ohc, 'state', 'current-workflow.json'));
 
 // Load recent learnings from cross-session JSONL
 let recentLearnings = null;

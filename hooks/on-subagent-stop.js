@@ -12,9 +12,7 @@ const fs   = require('fs');
 const path = require('path');
 const readline = require('readline');
 const memory = require('../scripts/memory');
-
-const CWD = process.cwd();
-const OHC = path.join(CWD, '.ohc');
+const { getOHC } = require('./resolve-paths');
 
 function mkdir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 function read(p)  { try { return fs.readFileSync(p, 'utf8'); } catch { return null; } }
@@ -26,10 +24,11 @@ rl.on('close', () => {
   let event = {};
   try { event = JSON.parse(raw); } catch {}
 
-  const sessionId = read(path.join(OHC, 'state', 'current-session.txt'))?.trim() || 'unknown';
+  const ohc = getOHC(process.cwd());
+  const sessionId = read(path.join(ohc, 'state', 'current-session.txt'))?.trim() || 'unknown';
   const agentName = event.agent_name || event.subagent_name || 'unnamed';
 
-  const workerDir = path.join(OHC, 'state', 'team', sessionId, 'workers', agentName);
+  const workerDir = path.join(ohc, 'state', 'team', sessionId, 'workers', agentName);
   mkdir(workerDir);
 
   const startedRaw = read(path.join(workerDir, 'started.json'));
