@@ -21,7 +21,7 @@ alwaysApply: true
    - RETRO will review and promote if valid
 
 ## After RETRO Workflow
-- Promote confirmed skills via `ohc skill promote <name>`
+- Promote confirmed drafts via `ohc skill promote <n>` (pick **n** from `ohc skill list`)
 - For Cursor-specific learnings: use /Generate Cursor Rules
 - Update ~/.ohc/USER.md if a personal preference was discovered
 

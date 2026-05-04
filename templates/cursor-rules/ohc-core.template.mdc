@@ -8,18 +8,27 @@ alwaysApply: true
 ## Session Start
 Read .ohc/notepad.md for current working state.
 Read .ohc/PROJECT.md for project context.
+If the repo root has **CONTEXT.md** or **CONTEXT-MAP.md** (`ohc setup` optional glossary), skim for domain vocabulary before implementation work.
 Greet user: current task + git branch + plan progress.
 
 ## Workflow Routing
-- "explore"   → EXPLORE: read codebase, populate .ohc/PROJECT.md
-- "plan"      → PLAN: interview → design → .ohc/plans/ → confirm before build
-- "build"     → BUILD: load plan → subagents → TDD → verify
-- "review"    → REVIEW: spec compliance first, code quality second
-- "ship"      → SHIP: pre-merge check → changelog → PR → clean
-- "retro"     → RETRO: session diff → learnings → update memory files
-- "autopilot" → PLAN + BUILD + REVIEW chained, pause at plan for human OK
-- "team"      → /ohc-team N:provider "task" — parallel workers, RESULT.json gate, auto fix loop
-- "research"  → /ohc-research list|show|search — cross-session Context7/Brave doc cache
+Match **`hooks/keyword-map.json`** so Cursor behavior aligns with Claude Code hooks.
+
+- "explore"   → EXPLORE
+- "plan this", "design this", "write a plan" … → PLAN (confirm before BUILD)
+- "build" / "implement" → BUILD
+- "review" … → REVIEW
+- "ship" / "ship it" / "finish branch" → SHIP
+- "retro" → RETRO
+- "autopilot" / "full auto" → chained PLAN+BUILD+REVIEW per map
+- "ralph", `/ohc-ralph`, "keep going" → persistent BUILD (see **`skills/ralph`**)
+- document-intake phrases + `/ohc-document-intake` → **`skills/document-intake`**
+- "caveman mode" / exit phrases → **`skills/caveman`**
+- "team", `/ohc-team` → parallel workers + RESULT.json gate
+- `/ohc-research`, "research …" → `.ohc/research/` cache first
+
+### Cursor MCP
+Some MCPs (**context7**, **figma**, **sentry**) are often enabled via **[Cursor dashboard / plugins](https://cursor.com/dashboard/plugins)**. `ohc setup` may omit them from `.cursor/mcp.json` for stability — follow setup’s post-install tip if shown.
 
 ## Discipline Rules
 - No code for tasks >30min without a plan in .ohc/plans/
@@ -27,6 +36,7 @@ Greet user: current task + git branch + plan progress.
 - Stay within agreed scope. Spotted issues → .ohc/notepad.md, not fixes.
 - Use Context7 for any external library docs. Check .ohc/research/ cache FIRST;
   only fetch on miss, then save back so future sessions reuse it.
+- Run **`ohc doctor`** for workspace health hints.
 
 ## Memory Protocol
 - After significant work: update .ohc/notepad.md (what done, what next, blockers)
