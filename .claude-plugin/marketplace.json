@@ -8,7 +8,7 @@
     {
       "name": "oh-my-colab",
       "description": "Methodology + orchestration + persistent memory across Claude Code; pair with npm ohc setup for Cursor/Codex/Gemini.",
-      "version": "0.4.8",
+      "version": "0.5.0",
       "source": "./",
       "author": {
         "name": "iadr-dev",

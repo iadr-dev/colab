@@ -10,6 +10,23 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.5.0] — 2026-05-02
+
+### Added
+
+- **Vitest** harness (`vitest.config.js`, `npm run test:unit` / `test:all`) and **`tests/unit/`** coverage for hooks, team runner, doctor, memory, version, and utilities
+- **Advisor** and **librarian** agents (`agents/advisor.md`, `agents/librarian.md`); collaborator and writer revisions
+- **`package-lock.json`** and devDependencies **vitest**, **@vitest/coverage-v8**
+
+### Changed
+
+- **Hooks**: broader **keyword-map** triggers; session-end bookkeeping; user-prompt and pre-tool refinements
+- **Team** CLI: tmux and worktree orchestration fixes; result handling
+- **`ohc doctor`**, **memory** script, **version** helper, and **`ohc setup`** onboarding updates
+- **README**, **`.claude-plugin/plugin.json`**, **CLAUDE/GEMINI templates**, **brainstorming** skill
+
+---
+
 ## [0.4.8] — 2026-05-02
 
 ### Fixed
@@ -269,7 +286,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - JS syntax check (all hooks and scripts)
 - Shell script lint (shellcheck)
 
-[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.4.8...HEAD
+[Unreleased]: https://github.com/iadr-dev/colab/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/iadr-dev/colab/compare/v0.4.8...v0.5.0
 [0.4.8]: https://github.com/iadr-dev/colab/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/iadr-dev/colab/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/iadr-dev/colab/compare/v0.4.5...v0.4.6
