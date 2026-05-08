@@ -1,9 +1,13 @@
 {
   "name": "@iadr-dev/colab",
   "version": "0.6.1",
-  "description": "Team-first AI coding workflows. Methodology + orchestration + persistent memory across Claude Code, Cursor, Codex, Gemini, and Antigravity.",
+  "description": "oh-my-colab (@iadr-dev/colab, CLI ohc): team-first AI coding workflows — methodology, orchestration, persistent memory; Claude Code plugin + Cursor/Codex/Gemini/Antigravity.",
   "keywords": [
+    "oh-my-colab",
+    "ohc",
+    "iadr-dev",
     "claude-code",
+    "claude-code-plugin",
     "cursor",
     "codex",
     "gemini",
@@ -11,7 +15,10 @@
     "ai-coding",
     "workflows",
     "tdd",
-    "agents"
+    "agents",
+    "mcp",
+    "orchestration",
+    "persistent-memory"
   ],
   "license": "MIT",
   "bin": {

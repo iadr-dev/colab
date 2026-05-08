@@ -10,6 +10,18 @@ Your AI coding agent has the intelligence of a senior engineer. What it lacks is
 🔀 branch: feat/oauth │ agents: 3 running │ worktrees: 3 │ MCP: context7 github brave-search
 ```
 
+### Find this repo (discovery)
+
+| | |
+| --- | --- |
+| **Canonical name** | **oh-my-colab** — CLI command **`ohc`**, npm package [**`@iadr-dev/colab`**](https://www.npmjs.com/package/@iadr-dev/colab) |
+| **Source** | [**`github.com/iadr-dev/colab`**](https://github.com/iadr-dev/colab) |
+| **Not** | [Google Colab](https://colab.research.google.com/) notebooks — unrelated product with a similar short name |
+
+**Search tips:** in Google or GitHub, prefer quoted brand + org: **`"oh-my-colab"`** **`iadr-dev`**, or **`site:github.com/iadr-dev/colab`** so results are not drowned out by Google Colab.
+
+Repository **About** description and **Topics** (tags) on GitHub are set in **Settings → General**; they feed GitHub’s topic and search surfaces. Good pairs with this README: `oh-my-colab`, `ohc`, `claude-code-plugin`, `mcp`, `tdd`, `orchestration`.
+
 ---
 
 ## Why oh-my-colab?

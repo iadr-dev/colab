@@ -8,6 +8,10 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### Changed
+
+- **Discoverability**: README “Find this repo” (oh-my-colab vs Google Colab, npm, search tips); richer **`package.json`** and plugin/Cursor manifest **`keywords`** / descriptions for npm and marketplace matching
+
 ---
 
 ## [0.6.1] — 2026-05-08
