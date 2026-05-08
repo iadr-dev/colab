@@ -115,6 +115,18 @@ jobs:
           shellcheck skills/finishing-a-branch/scripts/pre-merge-check.sh
           echo "✓ All shell scripts pass shellcheck"
 
+  node-smoke-unit:
+    name: Vitest unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
+
   publish-check:
     name: npm pack dry-run
     runs-on: ubuntu-latest
