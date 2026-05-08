@@ -28,10 +28,21 @@ Greet user with one-line status after reading.
 ## Workflows
 - EXPLORE: read codebase → populate .ohc/PROJECT.md
 - PLAN: interview → design → task list → confirm with user
-- BUILD: load plan → subagents → TDD → verify
+- BUILD: load plan → **coding-skill-lookup** → subagents → TDD → verify
 - REVIEW: spec compliance → code quality → apply fixes
 - SHIP: verify tests → changelog → PR → clean
 - RETRO: session diff → learnings → update memory files
+
+## Coding Skills
+Coding skills live in `skills/coding/`. Apply the matching skill from the library before writing code:
+- React/Next.js: `coding/vercel-react-best-practices`
+- UI/Design: `coding/frontend-design`, `coding/ui-skills`, `coding/web-design-guidelines`
+- Database: `coding/supabase-postgres-best-practices`
+- Security: `coding/security-best-practices`
+- Android / Kotlin: `coding/android`
+- Other specialized skills: see `skills/coding/` directory.
+
+General utility: `find-skills`, `book-study`, `browser-use`, `agent-browser`, `pdf`, `seo-audit`, `skill-creator`
 
 ## Core Rules
 - No code for >30min tasks without a plan in .ohc/plans/
