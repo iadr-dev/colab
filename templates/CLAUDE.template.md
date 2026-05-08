@@ -62,7 +62,9 @@ Gate: show plan to user and await explicit "go" — do NOT hand to BUILD without
 
 ## BUILD
 Trigger: keyword "build" | /ohc-build | confirmed plan exists
-Chain: load-plan → subagent-driven-development skill → test-driven-development skill → verifier agent
+Chain: load-plan → **coding-skill-lookup** → subagent-driven-development skill → test-driven-development skill → verifier agent
+Coding skill lookup: for each task, apply the matching skill from `skills/coding/` before writing code.
+UI tasks always apply `coding/frontend-design` + framework skill. Security tasks apply `coding/security-best-practices`.
 Each task: dispatch executor → verifier checks → loop until 0 failing 0 skipped
 
 ## REVIEW
@@ -118,6 +120,41 @@ When writing or reviewing code using any external library:
 3. Invoke: "use context7" or specify library ID from skills/context7-aware-coding/references/library-ids.md
 4. If Context7 returns nothing: Brave Search → then flag uncertainty explicitly
 </ohc_context7_protocol>
+
+<ohc_coding_skills>
+Coding skills live in `skills/coding/`. Apply them automatically by context — the hook will inject them when keywords match:
+
+| Skill                                  | When to use                                    |
+|----------------------------------------|------------------------------------------------|
+| `coding/vercel-react-best-practices`   | React, Next.js, server components              |
+| `coding/vercel-react-native-skills`    | React Native, mobile apps                      |
+| `coding/vercel-composition-patterns`   | Component API design, composability            |
+| `coding/frontend-design`              | UI implementation, visual quality              |
+| `coding/web-design-guidelines`         | Layout, spacing, web visual standards          |
+| `coding/theme-factory`                 | Theming, design tokens, color systems          |
+| `coding/brand-guidelines`              | Brand-consistent styling                       |
+| `coding/canvas-design`                 | HTML Canvas / WebGL rendering                  |
+| `coding/ui-skills`                     | UI component libraries, component APIs         |
+| `coding/sleek-design-mobile-apps`      | Premium mobile UI aesthetics                   |
+| `coding/figma-implement-design`        | Figma-to-code translation                      |
+| `coding/supabase-postgres-best-practices` | Supabase, Postgres queries, RLS             |
+| `coding/redis-agent-skills`            | Redis caching, pub/sub patterns                |
+| `coding/cloudflare-skills`             | Cloudflare Workers, Pages, D1                  |
+| `coding/remotion-best-practices`       | Remotion video components                      |
+| `coding/sentry`                        | Sentry error tracking integration              |
+| `coding/playwright-interactive`        | Playwright e2e tests, browser automation       |
+| `coding/security-best-practices`       | Auth, XSS, SQLi, secrets, secure patterns      |
+| `coding/azure-cost-optimization`       | Azure resource cost management                 |
+| `coding/android`                       | Android, Kotlin, Jetpack Compose, AGP, CameraX |
+
+General utility skills (`skills/`):
+- `find-skills` — discover additional skills at install time
+- `book-study` — systematic book reading with active recall and spaced repetition
+- `browser-use` / `agent-browser` — browser automation via agent
+- `pdf` — parse and extract PDF content
+- `seo-audit` — SEO analysis and recommendations
+- `skill-creator` — create new custom skills
+</ohc_coding_skills>
 
 <ohc_mcp_servers>
 Active MCP servers: run `claude mcp list` to see configured servers.

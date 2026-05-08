@@ -16,7 +16,7 @@ Match **`hooks/keyword-map.json`** so Cursor behavior aligns with Claude Code ho
 
 - "explore"   → EXPLORE
 - "plan this", "design this", "write a plan" … → PLAN (confirm before BUILD)
-- "build" / "implement" → BUILD
+- "build" / "implement" → BUILD: load plan → **coding-skill-lookup** → subagents → TDD → verify
 - "review" … → REVIEW
 - "ship" / "ship it" / "finish branch" → SHIP
 - "retro" → RETRO
