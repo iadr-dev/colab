@@ -82,6 +82,89 @@
   "stopomc":          { "skill": "all",                           "mode": "persistent", "action": "deactivate" },
   "stop all":         { "skill": "all",                           "mode": "persistent", "action": "deactivate" },
 
+  "_comment_coding_skills": "── Coding & UI skills (installed in skills/coding/) ──────────────────────────",
+
+  "react":               { "skill": "coding/vercel-react-best-practices",       "mode": "enforce" },
+  "next.js":             { "skill": "coding/vercel-react-best-practices",       "mode": "enforce" },
+  "nextjs":              { "skill": "coding/vercel-react-best-practices",       "mode": "enforce" },
+  "server component":    { "skill": "coding/vercel-react-best-practices",       "mode": "enforce" },
+
+  "react native":        { "skill": "coding/vercel-react-native-skills",        "mode": "enforce" },
+  "mobile app":          { "skill": "coding/vercel-react-native-skills",        "mode": "enforce" },
+
+  "composition pattern": { "skill": "coding/vercel-composition-patterns",       "mode": "single" },
+  "component pattern":   { "skill": "coding/vercel-composition-patterns",       "mode": "single" },
+
+  "design ui":           { "skill": "coding/frontend-design",                   "mode": "enforce" },
+  "design the ui":       { "skill": "coding/frontend-design",                   "mode": "enforce" },
+  "ui design":           { "skill": "coding/frontend-design",                   "mode": "enforce" },
+  "frontend design":     { "skill": "coding/frontend-design",                   "mode": "enforce" },
+
+  "web design":          { "skill": "coding/web-design-guidelines",              "mode": "enforce" },
+  "design guidelines":   { "skill": "coding/web-design-guidelines",              "mode": "enforce" },
+
+  "theme":               { "skill": "coding/theme-factory",                     "mode": "single" },
+  "color scheme":        { "skill": "coding/theme-factory",                     "mode": "single" },
+  "design tokens":       { "skill": "coding/theme-factory",                     "mode": "single" },
+
+  "brand":               { "skill": "coding/brand-guidelines",                  "mode": "single" },
+  "brand guidelines":    { "skill": "coding/brand-guidelines",                  "mode": "single" },
+
+  "canvas":              { "skill": "coding/canvas-design",                     "mode": "single" },
+  "html canvas":         { "skill": "coding/canvas-design",                     "mode": "single" },
+
+  "ui components":       { "skill": "coding/ui-skills",                         "mode": "enforce" },
+  "ui kit":              { "skill": "coding/ui-skills",                         "mode": "enforce" },
+  "component library":   { "skill": "coding/ui-skills",                         "mode": "enforce" },
+
+  "mobile design":       { "skill": "coding/sleek-design-mobile-apps",          "mode": "enforce" },
+  "sleek design":        { "skill": "coding/sleek-design-mobile-apps",          "mode": "enforce" },
+
+  "figma":               { "skill": "coding/figma-implement-design",            "mode": "single" },
+  "implement design":    { "skill": "coding/figma-implement-design",            "mode": "single" },
+
+  "supabase":            { "skill": "coding/supabase-postgres-best-practices",  "mode": "enforce" },
+  "postgres":            { "skill": "coding/supabase-postgres-best-practices",  "mode": "enforce" },
+
+  "redis":               { "skill": "coding/redis-agent-skills",                "mode": "enforce" },
+
+  "cloudflare":          { "skill": "coding/cloudflare-skills",                 "mode": "enforce" },
+
+  "remotion":            { "skill": "coding/remotion-best-practices",           "mode": "enforce" },
+  "video component":     { "skill": "coding/remotion-best-practices",           "mode": "enforce" },
+
+  "sentry":              { "skill": "coding/sentry",                            "mode": "enforce" },
+  "error tracking":      { "skill": "coding/sentry",                            "mode": "enforce" },
+
+  "playwright":          { "skill": "coding/playwright-interactive",            "mode": "enforce" },
+  "end to end":          { "skill": "coding/playwright-interactive",            "mode": "enforce" },
+  "e2e test":            { "skill": "coding/playwright-interactive",            "mode": "enforce" },
+
+  "security":            { "skill": "coding/security-best-practices",           "mode": "enforce" },
+  "secure coding":       { "skill": "coding/security-best-practices",           "mode": "enforce" },
+  "xss":                 { "skill": "coding/security-best-practices",           "mode": "enforce" },
+  "sql injection":       { "skill": "coding/security-best-practices",           "mode": "enforce" },
+  "auth":                { "skill": "coding/security-best-practices",           "mode": "single" },
+
+  "azure":               { "skill": "coding/azure-cost-optimization",           "mode": "single" },
+  "cloud cost":          { "skill": "coding/azure-cost-optimization",           "mode": "single" },
+
+  "pdf":                 { "skill": "pdf",                                       "mode": "single" },
+  "parse pdf":           { "skill": "pdf",                                       "mode": "single" },
+
+  "seo":                 { "skill": "seo-audit",                                "mode": "single" },
+  "seo audit":           { "skill": "seo-audit",                                "mode": "single" },
+
+  "find skill":          { "skill": "find-skills",                              "mode": "single" },
+  "discover skill":      { "skill": "find-skills",                              "mode": "single" },
+  "search skills":       { "skill": "find-skills",                              "mode": "single" },
+
+  "browser use":         { "skill": "browser-use",                              "mode": "single" },
+  "agent browser":       { "skill": "agent-browser",                            "mode": "single" },
+
+  "create skill":        { "skill": "skill-creator",                            "mode": "single" },
+  "new skill":           { "skill": "skill-creator",                            "mode": "single" },
+
   "_custom": {
     "_comment": "Add your team's custom triggers here. Same format as above.",
     "_example": "\"deploy staging\": { \"workflow\": \"SHIP\", \"mode\": \"single\" }"
