@@ -36,7 +36,16 @@ estimated_total: Xh
 ## Tasks
 ### Task 1: Name — executor — file(s) — Xh
 Description. Output: verifiable artifact.
+Note: Specify if a coding skill from `skills/coding/` should be applied (e.g., "with `coding/security-best-practices`").
 ```
+
+## Coding Skill Awareness
+When planning, recommend specific skills from `skills/coding/` for relevant tasks:
+- UI/React: `coding/vercel-react-best-practices`, `coding/frontend-design`
+- Data/DB: `coding/supabase-postgres-best-practices`, `coding/redis-agent-skills`
+- Security: `coding/security-best-practices`
+- Infrastructure: `coding/cloudflare-skills`, `coding/azure-cost-optimization`
+- Android / Kotlin: `coding/android`
 
 ## Memory Flush
 Before exiting, append to .ohc/notepad.md:

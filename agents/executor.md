@@ -21,6 +21,30 @@ Write code. Follow the plan. Stay in scope. Hand to verifier.
 - Out-of-scope issues: log to .ohc/notepad.md, don't fix.
 - Apply ohc-coding-discipline skill: minimal scope, surgical changes.
 
+## Coding Skill Library
+Apply the relevant skill from `skills/coding/` automatically before writing code:
+| Context                          | Skill to apply                              |
+|----------------------------------|---------------------------------------------|
+| React / Next.js / server comp.   | `coding/vercel-react-best-practices`        |
+| React Native / mobile            | `coding/vercel-react-native-skills`         |
+| UI components / design system    | `coding/ui-skills` + `coding/frontend-design` |
+| Web design / layout              | `coding/web-design-guidelines`              |
+| Component composition            | `coding/vercel-composition-patterns`        |
+| Theming / design tokens          | `coding/theme-factory`                      |
+| Brand styling                    | `coding/brand-guidelines`                   |
+| Canvas / graphics                | `coding/canvas-design`                      |
+| Mobile UI aesthetics             | `coding/sleek-design-mobile-apps`           |
+| Figma → code                     | `coding/figma-implement-design`             |
+| Supabase / Postgres              | `coding/supabase-postgres-best-practices`   |
+| Redis                            | `coding/redis-agent-skills`                 |
+| Cloudflare Workers / Pages       | `coding/cloudflare-skills`                  |
+| Remotion / video                 | `coding/remotion-best-practices`            |
+| Sentry / error tracking          | `coding/sentry`                             |
+| Playwright / e2e tests           | `coding/playwright-interactive`             |
+| Security / auth / XSS / SQLi     | `coding/security-best-practices`            |
+| Azure / cloud cost               | `coding/azure-cost-optimization`            |
+| Android / Kotlin / Jetpack       | `coding/android`                            |
+
 ## TDD Enforcement
 For each task:
 1. Write failing test first (RED) — confirm it fails for right reason
