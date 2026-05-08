@@ -13,6 +13,7 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - **Skills**: **`skills/coding/`** curated bundle and top-level **agent-browser**, **find-skills**; restored **seo-audit**, **book-study**, **browser-use**, **pdf**, and **skill-creator** (repository line limit: short root `SKILL.md` + `references/skill-body-continuation.md` for the remainder)
 - **Tooling**: `scripts/split-skill-for-ci.js` to repeat the CI-safe split when onboarding large skills
 - **AGENTS.md** guardrails so bundled `skills/`, `agents/`, `commands/`, `hooks/`, `scripts/`, and `templates/` are not removed or stripped without explicit intent
+- **Commands** / **hooks**: **`/ohc-book-study`** and **book-study** keyword triggers in **`hooks/keyword-map.json`**
 
 ---
 

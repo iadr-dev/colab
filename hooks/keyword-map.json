@@ -165,6 +165,11 @@
   "create skill":        { "skill": "skill-creator",                            "mode": "single" },
   "new skill":           { "skill": "skill-creator",                            "mode": "single" },
 
+  "read this book":      { "skill": "book-study",                             "mode": "single" },
+  "book study":          { "skill": "book-study",                             "mode": "single" },
+  "start studying":      { "skill": "book-study",                             "mode": "single" },
+  "/ohc-book-study":     { "skill": "book-study",                             "mode": "single" },
+
   "_custom": {
     "_comment": "Add your team's custom triggers here. Same format as above.",
     "_example": "\"deploy staging\": { \"workflow\": \"SHIP\", \"mode\": \"single\" }"
