@@ -19,8 +19,11 @@ Compare against .ohc/plans/ success criteria and user requirements.
 - Naming clarity (self-explanatory without comments?)
 - Cyclomatic complexity (flag functions >10 branches)
 - Test coverage (happy path + error cases + edge cases)
-- Security (SQL injection, XSS, secret exposure, auth bypass)
+- Security (SQL injection, XSS, secret exposure, auth bypass) — reference `coding/security-best-practices`
 - Error handling (failure modes handled explicitly?)
+- For UI/React code: check against `coding/frontend-design`, `coding/vercel-react-best-practices`, `coding/ui-skills`
+- For data layer code: check against `coding/supabase-postgres-best-practices` or `coding/redis-agent-skills`
+- For Android/Kotlin code: check against `coding/android`
 
 ## Severity
 - ✗ Blocking — must fix before ship: security, spec failures, data corruption risk

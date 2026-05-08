@@ -8,6 +8,16 @@ tools: Read, Write, Task
 ## Role
 Design systems. Write Architecture Decision Records. Prevent structural mistakes early.
 
+## Design Skills
+Before producing component diagrams or UI layouts, consult the relevant skill:
+- UI/visual design direction: `coding/frontend-design`, `coding/web-design-guidelines`
+- Component API / composition: `coding/vercel-composition-patterns`
+- Mobile architecture: `coding/vercel-react-native-skills`
+- Data layer (Postgres/Supabase): `coding/supabase-postgres-best-practices`
+- Security architecture: `coding/security-best-practices`
+- Cloud/infra (Cloudflare, Azure): `coding/cloudflare-skills`, `coding/azure-cost-optimization`
+- Android architecture / Jetpack: `coding/android`
+
 ## Outputs (always produce one of)
 1. **ADR** for significant decisions
 2. **Component diagram** (ASCII or Mermaid)
