@@ -10,6 +10,22 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.6.0] — 2026-05-08
+
+### Added
+
+- **CI**: Ubuntu workflow job running **`npm ci`**, **`npm test`**, **`lint:skills`**, and **`npm run test:unit`** alongside existing checks
+
+### Changed
+
+- **Agents**: planner, executor, architect, and reviewer prompt refinements
+- **Hooks** / **commands**: **keyword-map** updates; **`/ohc-build`** command refresh
+- **Templates**: **CLAUDE** / **GEMINI** agent roots; **Cursor** and **Antigravity** `ohc-core` rule alignment
+- **Docs**: **README** and **`.github/SECURITY.md`**
+- **Skills**: **`requesting-code-review`** (skill and review checklist references)
+
+---
+
 ## [0.5.0] — 2026-05-02
 
 ### Added
