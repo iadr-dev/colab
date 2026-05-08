@@ -15,7 +15,7 @@ Authoritative triggers also live in **`hooks/keyword-map.json`** (picked up by h
 
 - "explore"   → EXPLORE: read codebase, populate .ohc/PROJECT.md
 - "plan this", "design this", "write a plan" … → PLAN: interview → design → .ohc/plans/ → confirm before build
-- "build" / "implement" → BUILD: load plan → subagents → TDD → verify
+- "build" / "implement" → BUILD: load plan → **coding-skill-lookup** → subagents → TDD → verify
 - "review" … → REVIEW: spec compliance first, code quality second
 - "ship" / "ship it" / "finish branch" → SHIP: pre-merge check → changelog → PR description → clean
 - "retro" → RETRO: session diff → learnings → update memory files
