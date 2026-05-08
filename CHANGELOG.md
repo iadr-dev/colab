@@ -8,6 +8,12 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### Added
+
+- **Skills**: **`skills/coding/`** curated bundle and top-level **agent-browser**, **find-skills**; restored **seo-audit**, **book-study**, **browser-use**, **pdf**, and **skill-creator** (repository line limit: short root `SKILL.md` + `references/skill-body-continuation.md` for the remainder)
+- **Tooling**: `scripts/split-skill-for-ci.js` to repeat the CI-safe split when onboarding large skills
+- **AGENTS.md** guardrails so bundled `skills/`, `agents/`, `commands/`, `hooks/`, `scripts/`, and `templates/` are not removed or stripped without explicit intent
+
 ---
 
 ## [0.6.0] — 2026-05-08
