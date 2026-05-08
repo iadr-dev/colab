@@ -83,7 +83,7 @@ Core six:
 | `"explore"`    | **EXPLORE** | Reads codebase, populates `.ohc/PROJECT.md`                                                                                        |
 | `"deepsearch"` | **EXPLORE** | Targeted deep search — grep patterns, trace data flows, map dependencies for a specific concept (deep mode of explore)             |
 | `"plan this"`  | **PLAN**    | Interview → approaches → task list → confirms before building (`"design this"` routes here too — see **`hooks/keyword-map.json`**) |
-| `"build"`      | **BUILD**   | Loads plan → subagents → TDD → verifier (`"implement"` synonyms in keyword map)                                                    |
+| `"build"`      | **BUILD**   | Loads plan → **coding-skill-lookup** → subagents → TDD → verifier                                                                  |
 | `"review"`     | **REVIEW**  | Spec compliance + code quality report                                                                                              |
 | `"ship it"`    | **SHIP**    | Pre-merge check → changelog → PR → clean                                                                                           |
 | `"retro"`      | **RETRO**   | Session diff → patterns → update memory files                                                                                      |
@@ -196,7 +196,7 @@ ohc team list                         # List all active teams
 | **ralph**                       | `"ralph"`, `"keep going"`, `"ralph mode"`, **`/ohc-ralph`**                                                 | Persistent BUILD until tests pass                                                           |
 | **caveman**                     | **`"stop caveman"`** / **`"normal mode"`** (exit); **`"caveman mode"`**, **`"compressed mode"`** (enter)    | Persistent compressed responses with technical accuracy                                     |
 
-The repo ships **16** skills under **`skills/*/SKILL.md`**. Canonical keyword list: **`hooks/keyword-map.json`**.
+The repo ships **33** skills under **`skills/*/SKILL.md`** and **`skills/coding/*/SKILL.md`**. Canonical keyword list: **`hooks/keyword-map.json`**.
 
 Each skill: `SKILL.md` (≤200 lines) + `references/` (on demand) + `scripts/` (output only).
 

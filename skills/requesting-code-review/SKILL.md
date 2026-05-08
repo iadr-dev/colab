@@ -1,69 +1,155 @@
 ---
 name: requesting-code-review
 description: >
-  Two-pass code review: spec compliance first, code quality second. Produces
-  structured report with ✓/⚠/✗ items. Blocking issues must be fixed before ship.
+  Senior-engineer code review: spec compliance first, then SOLID, security,
+  performance, and code quality. Produces a structured P0-P3 severity report.
+  Blocking issues (P0/P1) must be resolved before merge.
   Triggers on keyword "review" or when REVIEW workflow is active.
 allowed-tools: Read Bash
 ---
 
-# Code Review — Two-Pass Protocol
+# Code Review — Senior Engineer Protocol
 
-Pass 1: does it do what was asked? Pass 2: is it well-written?
-Never merge until all ✗ blocking issues are resolved.
+**Default**: review-only output. Do NOT implement fixes unless user explicitly confirms.
 
-## Pass 1 — Spec Compliance
+## Severity Levels
 
-Compare against .ohc/plans/ success criteria and user requirements.
+| Level | Name | Description | Action |
+|-------|------|-------------|--------|
+| **P0** | Critical | Security vulnerability, data loss, correctness bug | Must block merge |
+| **P1** | High | Logic error, significant SOLID violation, performance regression | Should fix before merge |
+| **P2** | Medium | Code smell, maintainability concern, minor violation | Fix now or create follow-up |
+| **P3** | Low | Style, naming, minor suggestion | Optional improvement |
+
+## Workflow
+
+### Step 1 — Preflight Context
+
+```bash
+git status -sb
+git diff --stat
+git diff
+```
+
+- Identify entry points, auth boundaries, and critical paths (payments, data writes, network).
+- **If no diff**: inform user, ask if they want staged changes or a specific commit range.
+- **If large diff (>500 lines)**: summarize by file first, then review in batches by module.
+
+### Step 2 — Spec Compliance (Pass 1)
+
+Compare against `.ohc/plans/` success criteria and user requirements.
 
 For each requirement:
 - ✓ **Implemented** — code clearly implements this
 - ⚠ **Partial** — implemented with a gap (name the gap)
 - ✗ **Missing** — not implemented (blocking)
 
-Do NOT comment on code quality in Pass 1. Only: does it do what was asked?
+Do NOT comment on code quality in this pass. Only: does it do what was asked?
 
-## Pass 2 — Code Quality (only after Pass 1 clean)
+### Step 3 — SOLID + Architecture
 
-**Naming** (⚠ severity):
-- Variable, function, file names clear without comments to explain?
-- Names match conventions in PROJECT.md?
+Load `references/solid-checklist.md`. Look for:
+- **SRP**: Modules with unrelated responsibilities
+- **OCP**: Behavior added by editing, not extending
+- **LSP**: Subclasses that break parent contract
+- **ISP**: Wide interfaces with unused methods
+- **DIP**: High-level logic coupled to concrete implementations
 
-**Complexity** (⚠ severity):
-- Functions >10 branches → flag for decomposition
-- Files >300 lines → flag for splitting
+When proposing a refactor, explain *why* and outline a minimal, safe, incremental plan.
 
-**Test coverage** (✓ required):
-- Happy path tested?
-- Error cases tested?
-- Edge cases (null, empty, boundary values)?
+### Step 4 — Removal Candidates
 
-**Security** (✗ severity):
-- SQL injection: raw string interpolation into queries?
-- XSS: user input rendered without escaping?
-- Auth bypass: unauthenticated request reaching protected routes?
-- Secret exposure: API keys or passwords in code?
+Load `references/removal-plan.md`. Identify:
+- Unused code, redundant logic, feature-flagged-off code
+- Distinguish **safe delete now** vs **defer with plan**
 
-**Error handling** (⚠ severity):
-- All failure modes handled explicitly?
-- Error messages include useful context?
+### Step 5 — Security & Reliability Scan
 
-## Output Format
+Load `references/security-checklist.md`. Check for:
+- XSS, injection (SQL/NoSQL/command), SSRF, path traversal
+- AuthZ/AuthN gaps, IDOR, missing tenancy checks
+- JWT issues: algorithm confusion, weak secrets, missing `exp`/`iss`/`aud`
+- Secret/PII leakage, excessive logging, missing data masking
+- Race conditions: TOCTOU, check-then-act, missing DB transactions
+- Runtime risks: unbounded loops, missing timeouts, ReDoS
+- Weak crypto (MD5/SHA1), hardcoded IVs, missing HMAC
+
+### Step 6 — Code Quality Scan
+
+Load `references/code-quality-checklist.md`. Check for:
+- **Error handling**: swallowed exceptions, unhandled promise rejections, missing context
+- **Performance**: N+1 queries, sync I/O in async context, unbounded collections, missing cache
+- **Boundary conditions**: null/undefined, empty collections, off-by-one, integer overflow
+
+### Step 7 — Output Format
+
+```markdown
+## Code Review Summary
+
+**Files reviewed**: X files, Y lines changed
+**Overall assessment**: [APPROVE / REQUEST_CHANGES / COMMENT]
+
+---
+
+## Findings
+
+### P0 - Critical
+(none or list)
+
+### P1 - High
+1. **[file:line]** Brief title
+   - Description of issue
+   - Suggested fix
+
+### P2 - Medium
+2. (continue numbering across sections)
+
+### P3 - Low
+...
+
+---
+
+## Spec Compliance
+✓ Implements: ...
+⚠ Partial: ...
+✗ Missing: ...
+
+## Removal/Iteration Plan
+(if applicable)
 ```
-# Review: {task/PR name}
 
-## Pass 1: Spec Compliance
-✓ Implements: user login with email + password
-⚠ Partial: logout — clears session but doesn't invalidate server-side token
-✗ Missing: refresh token rotation (in success criteria)
-
-## Pass 2: Code Quality
-✓ Naming clear and consistent with conventions
-⚠ auth.service.ts:87 — function has 12 branches — suggest splitting
-✗ auth.controller.ts:42 — SQL uses string interpolation — injection risk
-
-## Summary
-Blocking: 2 — SQL injection + missing refresh token rotation
+**Inline comment format** for file-specific findings:
+```
+::code-comment{file="path/to/file.ts" line="42" severity="P1"}
+Description of the issue and suggested fix.
+::
 ```
 
-See references/review-checklist.md for full checklist.
+**Clean review**: If no issues found, explicitly state:
+- What was checked
+- Areas not covered (e.g., "Did not verify database migrations")
+- Residual risks or recommended follow-up tests
+
+### Step 8 — Next Steps Confirmation
+
+After presenting findings, ask:
+
+```markdown
+## Next Steps
+
+I found X issues (P0: _, P1: _, P2: _, P3: _).
+
+**How would you like to proceed?**
+1. **Fix all** — I'll implement all suggested fixes
+2. **Fix P0/P1 only** — Address critical and high priority issues
+3. **Fix specific items** — Tell me which issues to fix
+4. **No changes** — Review complete, no implementation needed
+```
+
+**Important**: Do NOT implement any changes until user explicitly confirms.
+
+---
+
+See `references/review-checklist.md` for quick checklist reference.
+See `references/solid-checklist.md`, `references/security-checklist.md`,
+`references/code-quality-checklist.md`, `references/removal-plan.md` for full coverage.

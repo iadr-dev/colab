@@ -4,7 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 0.4.x   | ✓         |
+| 0.6.x   | ✓         |
 
 ## Reporting
 
