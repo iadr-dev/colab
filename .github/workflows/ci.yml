@@ -116,7 +116,7 @@ jobs:
           echo "✓ All shell scripts pass shellcheck"
 
   node-smoke-unit:
-    name: Vitest unit tests
+    name: Node smoke + Vitest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -125,6 +125,8 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
+      - run: npm test
+      - run: npm run lint:skills
       - run: npm run test:unit
 
   publish-check:
