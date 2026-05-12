@@ -1,6 +1,6 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "oh-my-colab (@iadr-dev/colab, CLI ohc): team-first AI coding workflows — methodology, orchestration, persistent memory; Claude Code plugin + Cursor/Codex/Gemini/Antigravity.",
   "keywords": [
     "oh-my-colab",

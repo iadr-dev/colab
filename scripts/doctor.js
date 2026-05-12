@@ -67,13 +67,26 @@ function main() {
   if (acc(path.join(CWD, '.claude', 'hooks', 'on-user-prompt.js')))
     passes.push('.claude on-user-prompt hook present');
 
-  const hooksJson = path.join(CWD, '.claude', 'hooks', 'hooks.json');
-  if (acc(hooksJson)) {
+  const claudeProjSettings = path.join(CWD, '.claude', 'settings.json');
+  if (acc(claudeProjSettings)) {
     try {
-      JSON.parse(fs.readFileSync(hooksJson, 'utf8'));
-      passes.push('.claude/hooks/hooks.json parses');
+      const s = JSON.parse(fs.readFileSync(claudeProjSettings, 'utf8'));
+      const h = s && s.hooks && typeof s.hooks === 'object' ? Object.keys(s.hooks) : [];
+      if (h.length) passes.push(`.claude/settings.json declares hooks (${h.length} events)`);
+      else notes.push('.claude/settings.json missing hooks block — rerun ohc setup');
     } catch {
-      notes.push('.claude/hooks/hooks.json invalid JSON');
+      notes.push('.claude/settings.json unreadable JSON');
+      exit = 1;
+    }
+  }
+
+  const hooksJsonVerbose = path.join(CWD, '.claude', 'hooks.json');
+  if (acc(hooksJsonVerbose)) {
+    try {
+      JSON.parse(fs.readFileSync(hooksJsonVerbose, 'utf8'));
+      passes.push('.claude/hooks.json (verbose) parses');
+    } catch {
+      notes.push('.claude/hooks.json invalid JSON');
       exit = 1;
     }
   }

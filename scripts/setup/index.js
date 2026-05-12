@@ -175,6 +175,40 @@ function tmpl(f)  { return fs.readFileSync(path.join(PKG_ROOT, 'templates', f), 
 function fill(t, vars) { return t.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] || `{{${k}}}`); }
 function write(p, c, mode) { mkdir(path.dirname(p)); fs.writeFileSync(p, c, mode); }
 
+/** Rewrite ${CLAUDE_PLUGIN_ROOT}/hooks/ → .claude/hooks/ for project-local ohc setup. */
+function replaceCommandsForProjectHooks(obj) {
+  if (Array.isArray(obj)) return obj.map(replaceCommandsForProjectHooks);
+  if (obj !== null && typeof obj === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (k === 'command' && typeof v === 'string') {
+        out[k] = v.replace(/\$\{CLAUDE_PLUGIN_ROOT\}\/hooks\//g, '.claude/hooks/');
+      } else {
+        out[k] = replaceCommandsForProjectHooks(v);
+      }
+    }
+    return out;
+  }
+  return obj;
+}
+
+/** Nested hook map for .claude/settings.json (matches Claude Code docs + plugin-hooks.json shape). */
+function projectHooksNestedFromPluginManifest() {
+  const phPath = path.join(PKG_ROOT, 'hooks', 'plugin-hooks.json');
+  const data = JSON.parse(fs.readFileSync(phPath, 'utf8'));
+  return replaceCommandsForProjectHooks(data.hooks);
+}
+
+function mergeClaudeProjectSettingsHooks() {
+  const settingsPath = path.join(CWD, '.claude', 'settings.json');
+  let existing = {};
+  try {
+    existing = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  } catch (_) {}
+  const hooks = projectHooksNestedFromPluginManifest();
+  write(settingsPath, JSON.stringify({ ...existing, hooks }, null, 2));
+}
+
 /** Single-select glossary step: stable `value` for genContextSeed; `label` shows on-disk truth. */
 function contextSeedChoiceRows(cwd) {
   const ctxPath = path.join(cwd, 'CONTEXT.md');
@@ -378,7 +412,7 @@ function genContextSeed({ seedDomainTemplates }) {
 function genAgents({ project, selectedMcp, teamMode, platforms }) {
   const mcp = selectedMcp.map(s => `- ${s.name}`).join('\n') || '- (none)';
   const content = fill(tmpl('CLAUDE.template.md'), {
-    version: '0.6.1', project_name: project.projectName,
+    version: '0.6.2', project_name: project.projectName,
     install_date: new Date().toISOString().split('T')[0],
     team_mode: teamMode.includes('Solo') ? 'solo' : 'team',
     max_parallel: teamMode.includes('Large') ? '8' : '4',
@@ -430,8 +464,15 @@ function genSettings({ teamMode, hudStyle }) {
     ...mcpAllow
   ];
 
-  write(path.join(CWD, '.claude', 'settings.json'),
-    JSON.stringify({ permissions: { allow } }, null, 2));
+  const projSettingsPath = path.join(CWD, '.claude', 'settings.json');
+  let projectExisting = {};
+  try {
+    projectExisting = JSON.parse(fs.readFileSync(projSettingsPath, 'utf8'));
+  } catch (_) {}
+  write(
+    projSettingsPath,
+    JSON.stringify({ ...projectExisting, permissions: { allow } }, null, 2)
+  );
 }
 
 function copyDir(src, dst) {
@@ -451,7 +492,7 @@ function writeClaudeFiles() {
   const skillsDir = path.join(CWD, '.claude', 'skills');
   mkdir(hooksDir); mkdir(cmdsDir); mkdir(agentsDir); mkdir(skillsDir);
 
-  // Deploy hooks.json (Anthropic verbose format — single registration source)
+  // Auxiliary verbose hooks list (compat / tooling);
   const hooksSrc = path.join(PKG_ROOT, 'hooks', 'hooks.json');
   if (fs.existsSync(hooksSrc)) fs.copyFileSync(hooksSrc, path.join(CWD, '.claude', 'hooks.json'));
 
@@ -486,10 +527,13 @@ function writeClaudeFiles() {
   // Scripts (.claude/scripts/ for runtime support)
   const scriptsSrc = path.join(PKG_ROOT, 'scripts');
   if (fs.existsSync(scriptsSrc)) copyDir(scriptsSrc, path.join(CWD, '.claude', 'scripts'));
+
+  // Claude Code reads lifecycle hooks from .claude/settings.json (see code.claude.com docs).
+  mergeClaudeProjectSettingsHooks();
 }
 
 function writeCursor({ selectedMcp, mcpKeys, platforms }) {
-  // Cursor loads .claude/agents/, .claude/skills/, .claude/hooks.json for compatibility.
+  // Cursor loads .claude/agents/, .claude/skills/; Claude Code hooks live in .claude/settings.json (.claude/hooks.json verbose list is supplementary).
   // If Claude Code wasn't selected, seed .claude/ ourselves so Cursor can find them.
   if (!platforms.includes('Claude Code')) writeClaudeFiles();
 

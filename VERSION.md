@@ -1,6 +1,6 @@
 # Version Management
 
-**Shipping version:** **`0.6.1`** (see `package.json` and Git tag **`v0.6.1`**). For automation, `npm run version:current` is canonical.
+**Shipping version:** **`0.6.2`** (see `package.json` and Git tag **`v0.6.2`**). For automation, `npm run version:current` is canonical.
 
 oh-my-colab uses a centralized version management system to keep version numbers consistent across all configuration files.
 
