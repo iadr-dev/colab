@@ -8,9 +8,16 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+---
+
+## [0.6.2] — 2026-05-12
+
 ### Changed
 
 - **Discoverability**: README “Find this repo” (oh-my-colab vs Google Colab, npm, search tips); richer **`package.json`** and plugin/Cursor manifest **`keywords`** / descriptions for npm and marketplace matching
+- **`ohc setup` (Claude Code)**: merges the nested **`hooks`** block into **`.claude/settings.json`** (from **`hooks/plugin-hooks.json`** with `.claude/hooks/*.js` paths), aligned with Claude Code project settings; project **`permissions`** merges without wiping **`hooks`**; docs and **`commands/ohc-setup.md`** updated accordingly
+- **`ohc doctor`**: validates **`hooks`** in **`.claude/settings.json`** and **`.claude/hooks.json`** (removes bogus **`.claude/hooks/hooks.json`** path)
+- **`.claude-plugin/marketplace.json`**: plugin entry version kept in sync with release
 
 ---
 

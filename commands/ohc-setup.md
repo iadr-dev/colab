@@ -22,7 +22,8 @@ Steps:
 Setup writes:
 - ~/.claude/settings.json (team mode, env vars, statusLine)
 - CLAUDE.md + AGENTS.md (project root)
-- .claude/ agents/ + skills/ + commands/ + hooks/ + hooks.json (Claude Code; also used by Cursor for compat)
+- .claude/settings.json (permissions + nested `hooks` block for Claude Code — same shape as hooks/plugin-hooks.json with paths under `.claude/hooks/*.js`)
+- .claude/ agents/ + skills/ + commands/ + hooks/ + hooks.json (Claude Code; Cursor may reuse; hooks.json is auxiliary — primary wiring is settings.json per Claude docs)
 - .cursor/rules/*.mdc + .cursor/mcp.json (if Cursor)
 - .agents/{rules,skills,workflows}/ (if Antigravity) + global mcp_config.json
 - GEMINI.md + ~/.gemini/extensions/oh-my-colab/gemini-extension.json (if Gemini)

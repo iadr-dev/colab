@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "oh-my-colab",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "oh-my-colab — team-first AI coding workflows: methodology, orchestration, persistent memory (Claude Code + multi-platform CLI). Ships skills, slash commands, agents, hooks. npm `ohc setup` for onboarding.",
   "author": {
     "name": "iadr-dev",

@@ -1,6 +1,6 @@
 {
   "name": "@iadr-dev/colab",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "oh-my-colab (iadr-dev/colab): team-first AI workflows, memory, and discipline for Cursor — pairs with npm ohc / @iadr-dev/colab.",
   "rules": [
     ".cursor/rules/ohc-core.mdc",

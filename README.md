@@ -51,7 +51,7 @@ ohc setup
 
 ### Claude Code plugin (marketplace / git)
 
-Bundled manifests live under **[`.claude-plugin/`](.claude-plugin/)** (metadata only). Ships **`skills/`**, **`agents/`**, plugin hooks (**[`hooks/plugin-hooks.json`](hooks/plugin-hooks.json)** with **`${CLAUDE_PLUGIN_ROOT}`** per [plugins reference](https://docs.claude.com/en/docs/claude-code/plugins-reference)), and Claude slash definitions as **`commands/ohc-*.md`** (Workflows section lists them). **`ohc setup`** copies the verbose **[`hooks/hooks.json`](hooks/hooks.json)** into `.claude/hooks/` when you onboard a project workspace (and mirrors commands into `.claude/commands/`).
+Bundled manifests live under **[`.claude-plugin/`](.claude-plugin/)** (metadata only). Ships **`skills/`**, **`agents/`**, plugin hooks (**[`hooks/plugin-hooks.json`](hooks/plugin-hooks.json)** with **`${CLAUDE_PLUGIN_ROOT}`** per [plugins reference](https://docs.claude.com/en/docs/claude-code/plugins-reference)), and Claude slash definitions as **`commands/ohc-*.md`** (Workflows section lists them). **`ohc setup`** copies hook scripts under **`.claude/hooks/`** and merges the same nested hook definitions into **`.claude/settings.json`** (how [Claude Code expects hooks](https://code.claude.com/docs/en/claude-directory)); it also copies the verbose [`hooks/hooks.json`](hooks/hooks.json) to **`.claude/hooks.json`** for tooling compatibility (and mirrors commands into **`.claude/commands/`**).
 
 Develop from this repo for claude code:
 
@@ -82,7 +82,7 @@ Paths are created by **`ohc setup`** (`PROJECT.md` / `notepad.md` under `.ohc/` 
 
 ### 12-hook event system
 
-oh-my-colab intercepts **12 Claude Code lifecycle events** (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `SubagentStart`, `SubagentStop`, `PreCompact`, `PostCompact`, `Stop`, `SessionEnd`, `PermissionRequest`). Each hook runs a Node.js handler under **`hooks/`** that can inject `<system_reminder>` context, persist state, and enforce workflows. Plugin installs use **`hooks/plugin-hooks.json`** (with `${CLAUDE_PLUGIN_ROOT}` paths); `ohc setup` copies **`hooks/hooks.json`** (verbose format) into `.claude/`.
+oh-my-colab intercepts **12 Claude Code lifecycle events** (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `SubagentStart`, `SubagentStop`, `PreCompact`, `PostCompact`, `Stop`, `SessionEnd`, `PermissionRequest`). Each hook runs a Node.js handler under **`hooks/`** that can inject `<system_reminder>` context, persist state, and enforce workflows. Plugin installs use **`hooks/plugin-hooks.json`** (with `${CLAUDE_PLUGIN_ROOT}` paths). **`ohc setup`** wires the equivalent nested **`hooks`** object into **`.claude/settings.json`** and copies **`hooks/hooks.json`** to **`.claude/hooks.json`** as auxiliary reference.
 
 ---
 
